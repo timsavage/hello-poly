@@ -4,8 +4,9 @@
  * 
  * Currently this HAL supports:
  * 
- *  - DACS  0-3
- *  - Gates 0-3
+ *  - DACs       0-3
+ *  - Gates      0-3
+ *  - MIDI Ports 0
  */ 
 #pragma once
 
