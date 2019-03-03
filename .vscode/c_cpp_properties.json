@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "/home/tims/.arduino15/packages/arduino/tools/**",
+                "/home/tims/.arduino15/packages/arduino/hardware/sam/1.6.12/**",
+                "/home/tims/Applications/arduino-1.8.8/hardware/Arduino_STM32/STM32F1/libraries/**",
+                "/home/tims/Applications/arduino-1.8.8/hardware/Arduino_STM32/STM32F1/cores/maple/**"
+            ],
+            "forcedInclude": [
+                "/home/tims/.arduino15/packages/arduino/hardware/sam/1.6.12/cores/arduino/Arduino.h"
+            ],
+            "intelliSenseMode": "gcc-x64",
+            "compilerPath": "/usr/bin/clang",
+            "cStandard": "c11",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}
