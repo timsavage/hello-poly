@@ -1,9 +1,6 @@
 /**
  * DAC Device support for MSP4821, MSP4822, MSP 4921, MSP4922 12bit DACs.
  */
-#include <Arduino.h>
-#include <SPI.h>
-
 #include "devices::dac::MSP4X2X.h"
 
 using namespace devices::dac;

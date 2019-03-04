@@ -3,7 +3,7 @@
  */
 #pragma once
 
-#include "devices::midi.hpp"
+#include "devices::midi.h"
 
 namespace devices {
 namespace midi {

@@ -5,17 +5,13 @@
  * Currently this HAL supports:
  * 
  *  - DACs       0-3
+ *  - Display    0
  *  - Gates      0-3
- *  - MIDI Ports 0
+ *  - MIDI Port  0
  */ 
 #pragma once
 
-#include "devices::dac.hpp"
-#include "devices::gate.hpp"
-#include "devices::midi.hpp"
-
-#include "devices::dac::MSP4X2X.hpp"
-#include "devices::midi::Serial.hpp"
+#include <Arduino.h>
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -68,33 +64,5 @@ private:
     T **_devices;
     size_t _count;
 };
-
-
-/// DAC configuration ////////////////////////////////////////////////////////
-
-dac::MSP4X22 dac0(6, MSP4X22_DAC_A);
-dac::MSP4X22 dac1(6, MSP4X22_DAC_B);
-dac::MSP4X22 dac2(7, MSP4X22_DAC_A);
-dac::MSP4X22 dac3(7, MSP4X22_DAC_B);
-
-dac::DAC* dacList[] = {&dac0, &dac1, &dac2, &dac3};
-DeviceManager<dac::DAC> DACs(dacList, ARRAY_SIZE(dacList)); 
-
-
-/// Gate configuration ///////////////////////////////////////////////////////
-
-gate::Gate gate0(8);
-gate::Gate gate1(9);
-
-gate::Gate* gateList[] = {&gate0, &gate1};
-DeviceManager<gate::Gate> Gates(gateList, ARRAY_SIZE(gateList)); 
-
-
-/// MIDI Port configuration //////////////////////////////////////////////////
-
-midi::SerialMIDI midi0;
-
-midi::MIDI* midiList[] = {&midi0};
-DeviceManager<midi::MIDI> MIDI(midiList, ARRAY_SIZE(midiList)); 
 
 } //! devices
