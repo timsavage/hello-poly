@@ -1,20 +1,11 @@
 #include <Arduino.h>
-#include <Wire.h>
 
-#include "devices::hal.h"
+#include "devices.h"
 
 /// Initialisation code //////////////////////////////////////////////////////
 
 void setup() {
-  // Iitialise hardware
-  Serial.begin(115200);
-  Wire.begin();
-
-  devices::DACs.begin();
-  devices::Gates.begin();
-  devices::MIDI.begin();
-  delay(400);  // Delay required for display driver.
-  devices::display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+  devices::begin();
 
   // Set up the built-in LED pin as an output:
   pinMode(PC13, OUTPUT);

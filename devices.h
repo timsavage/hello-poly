@@ -12,6 +12,11 @@
 #pragma once
 
 #include <Arduino.h>
+#include <Adafruit_SSD1306_STM32.h>
+
+#include "devices::dac.h"
+#include "devices::gate.h"
+#include "devices::midi.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -64,5 +69,21 @@ private:
     T **_devices;
     size_t _count;
 };
+
+// DAC devices
+extern DeviceManager<devices::dac::DAC> DACs;
+
+// Gate devices
+extern DeviceManager<devices::gate::Gate> Gates;
+
+// MIDI devices
+extern DeviceManager<devices::midi::MIDI> MIDI;
+
+// Display device
+extern Adafruit_SSD1306 display;
+
+// Initialise hardware
+void
+begin(void);
 
 } //! devices

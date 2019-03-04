@@ -1,4 +1,7 @@
-#include "devices::hal.h"
+#include <Arduino.h>
+#include <Wire.h>
+
+#include "devices.h"
 
 #include "devices::dac::MSP4X2X.h"
 #include "devices::midi::Serial.h"
@@ -36,3 +39,18 @@ devices::DeviceManager<devices::midi::MIDI> devices::MIDI(midiList, ARRAY_SIZE(m
 /// Display configuration ////////////////////////////////////////////////////
 
 Adafruit_SSD1306 devices::display(-1);
+
+
+void
+devices::begin(void)
+{
+    Serial.begin(115200);
+    Wire.begin();
+
+    DACs.begin();
+    Gates.begin();
+    MIDI.begin();
+    
+    delay(400);  // Delay required for display driver.
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);    
+}
