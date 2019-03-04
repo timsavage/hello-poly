@@ -11,12 +11,10 @@ namespace midi {
 class SerialMIDI : public MIDI
 {
 public:
-    SerialMIDI() {}
+    SerialMIDI();
 
     void
-    begin(void) 
-    {
-    }
+    begin(void);
 };
 
 }}  //! midi::devices
