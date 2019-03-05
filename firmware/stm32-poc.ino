@@ -5,6 +5,7 @@
 /// Initialisation code //////////////////////////////////////////////////////
 
 void setup() {
+  // Initialise core devices
   devices::begin();
 
   // Set up the built-in LED pin as an output:
