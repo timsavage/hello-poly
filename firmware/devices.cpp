@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <SPI.h>
 #include <Wire.h>
 
 #include "devices.h"
@@ -14,8 +15,10 @@ dac::MSP4X22 dac0(4, MSP4X22_DAC_A);
 dac::MSP4X22 dac1(4, MSP4X22_DAC_B);
 dac::MSP4X22 dac2(5, MSP4X22_DAC_A);
 dac::MSP4X22 dac3(5, MSP4X22_DAC_B);
+dac::MSP4X22 dac4(6, MSP4X22_DAC_A);
+dac::MSP4X22 dac5(6, MSP4X22_DAC_B);
 
-dac::DAC* dacList[] = {&dac0, &dac1, &dac2, &dac3};
+dac::DAC* dacList[] = {&dac0, &dac1, &dac2, &dac3, &dac4, &dac5};
 devices::DeviceManager<devices::dac::DAC> devices::DACs(dacList, ARRAY_SIZE(dacList)); 
 
 
@@ -23,8 +26,10 @@ devices::DeviceManager<devices::dac::DAC> devices::DACs(dacList, ARRAY_SIZE(dacL
 
 devices::gate::Gate gate0(8);
 devices::gate::Gate gate1(9);
+devices::gate::Gate gate2(10);
+devices::gate::Gate gate3(11);
 
-devices::gate::Gate* gateList[] = {&gate0, &gate1};
+devices::gate::Gate* gateList[] = {&gate0, &gate1, &gate2, &gate3};
 devices::DeviceManager<devices::gate::Gate> devices::Gates(gateList, ARRAY_SIZE(gateList)); 
 
 
@@ -46,6 +51,7 @@ devices::begin(void)
 {
     Serial.begin(115200);
     Wire.begin();
+    SPI.begin();
 
     DACs.begin();
     Gates.begin();
@@ -54,3 +60,4 @@ devices::begin(void)
     delay(400);  // Delay required for display driver.
     display.begin(SSD1306_SWITCHCAPVCC, 0x3C);    
 }
+
