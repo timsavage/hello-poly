@@ -65,25 +65,32 @@ public:
         }
     }
 
+    //
+    // Loop
+    //
+    void
+    loop(void)
+    {
+        for (size_t idx = 0; idx < _count; idx++) {
+            _devices[idx]->loop();
+        }
+    }
+
 private:
     T **_devices;
     size_t _count;
 };
 
 // DAC devices
-extern DeviceManager<devices::dac::DAC> DACs;
+extern DeviceManager<dac::DAC> DACs;
 
 // Gate devices
-extern DeviceManager<devices::gate::Gate> Gates;
+extern DeviceManager<gate::Gate> Gates;
 
 // MIDI devices
-extern DeviceManager<devices::midi::MIDI> MIDI;
+extern DeviceManager<midi::MIDI> MIDI;
 
 // Display device
 extern Adafruit_SSD1306 display;
-
-// Initialise hardware
-void
-begin(void);
 
 } //! devices

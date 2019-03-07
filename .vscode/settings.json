@@ -9,6 +9,9 @@
         "unordered_map": "cpp",
         "vector": "cpp",
         "initializer_list": "cpp",
-        "string_view": "cpp"
+        "string_view": "cpp",
+        "*.tcc": "cpp",
+        "tuple": "cpp",
+        "utility": "cpp"
     }
 }

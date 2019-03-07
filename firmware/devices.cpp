@@ -19,45 +19,28 @@ dac::MSP4X22 dac4(6, MSP4X22_DAC_A);
 dac::MSP4X22 dac5(6, MSP4X22_DAC_B);
 
 dac::DAC* dacList[] = {&dac0, &dac1, &dac2, &dac3, &dac4, &dac5};
-devices::DeviceManager<devices::dac::DAC> devices::DACs(dacList, ARRAY_SIZE(dacList)); 
+DeviceManager<dac::DAC> DACs(dacList, ARRAY_SIZE(dacList)); 
 
 
 /// Gate configuration ///////////////////////////////////////////////////////
 
-devices::gate::Gate gate0(8);
-devices::gate::Gate gate1(9);
-devices::gate::Gate gate2(10);
-devices::gate::Gate gate3(11);
+// gate::Gate gate0(PB12);
+// gate::Gate gate1(PB13);
+// gate::Gate gate2(PB14);
+// gate::Gate gate3(PB15);
 
-devices::gate::Gate* gateList[] = {&gate0, &gate1, &gate2, &gate3};
-devices::DeviceManager<devices::gate::Gate> devices::Gates(gateList, ARRAY_SIZE(gateList)); 
+// gate::Gate* gateList[] = {&gate0, &gate1, &gate2, &gate3};
+// DeviceManager<gate::Gate> Gates(gateList, ARRAY_SIZE(gateList)); 
 
 
 /// MIDI Port configuration //////////////////////////////////////////////////
 
-devices::midi::SerialMIDI midi0;
+midi::SerialMIDI midi0(&Serial2);
 
-devices::midi::MIDI* midiList[] = {&midi0};
-devices::DeviceManager<devices::midi::MIDI> devices::MIDI(midiList, ARRAY_SIZE(midiList)); 
+midi::MIDI* midiList[] = {&midi0};
+DeviceManager<midi::MIDI> MIDI(midiList, ARRAY_SIZE(midiList)); 
 
 
 /// Display configuration ////////////////////////////////////////////////////
 
-Adafruit_SSD1306 devices::display(-1);
-
-
-void
-devices::begin(void)
-{
-    Serial.begin(115200);
-    Wire.begin();
-    SPI.begin();
-
-    DACs.begin();
-    Gates.begin();
-    MIDI.begin();
-    
-    delay(400);  // Delay required for display driver.
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);    
-}
-
+Adafruit_SSD1306 display(-1);
