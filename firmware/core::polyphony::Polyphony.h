@@ -16,17 +16,17 @@ namespace polyphony {
 class Polyphony
 {
 public:
-    //
-    // Event generated when a MIDI note on message is routed to model
-    //
-    virtual void
-    noteOn(uint8_t note, uint8_t velocity) = 0;
-
     // 
     // Event generated when a MIDI note off message is routed to model
     //
     virtual void
     noteOff(uint8_t note, uint8_t velocity) = 0;
+
+    //
+    // Event generated when a MIDI note on message is routed to model
+    //
+    virtual void
+    noteOn(uint8_t note, uint8_t velocity) = 0;
 
     //
     // Event generated when a MIDI pitch bend message is routed to model

@@ -8,7 +8,12 @@ Ordered::Ordered(OrderedMode mode)
 }
 
 void
-Ordered::on_note_on(uint8_t note, uint8_t velocity)
+Ordered::noteOff(uint8_t note, uint8_t velocity)
+{
+}
+
+void
+Ordered::noteOn(uint8_t note, uint8_t velocity)
 {
     // Find existing note
     size_t noteIdx = -1;
@@ -18,13 +23,8 @@ Ordered::on_note_on(uint8_t note, uint8_t velocity)
             break;
         }
     }
-    
 }
 
 void
-Ordered::on_note_off(uint8_t note, uint8_t velocity)
-{}
-
-void
-Ordered::on_pitch_bend(int16_t range)
+Ordered::pitchBend(int16_t range)
 {}
