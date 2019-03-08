@@ -8,9 +8,7 @@
 namespace core {
 namespace polyphony {
 
-// Maximum number of notes that can be played.
-#define MAX_NOTES 4
-
+#define NULL_NOTE 255
 
 // 
 // ABC class that provides the interface for Polyphony models.
@@ -34,8 +32,7 @@ public:
     // Event generated when a MIDI pitch bend message is routed to model
     //
     virtual void
-    pitchBend(int16_t range) = 0;
+    pitchBend(int16_t amount) = 0;
 };
 
 }}  //! polyphony::core
-

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Arduino.h>
+
 namespace devices {
 namespace midi {
 
@@ -26,6 +28,11 @@ enum MidiType
     SystemReset           = 0xFF,    // System Real Time - System Reset
 };
 
+typedef void (*noteCallbackFunc)(uint8_t channel, uint8_t note, uint8_t velocity);
+typedef void (*controlChangeCallbackFunc)(uint8_t channel, uint8_t control, uint8_t value);
+typedef void (*programChangeCallbackFunc)(uint8_t channel, uint8_t program);
+typedef void (*pitchBendCallbackFunc)(uint8_t channel, int16_t change);
+
 class MIDI
 {
 public:
@@ -34,6 +41,43 @@ public:
 
     virtual void
     loop(void) = 0;
+
+    void 
+    noteOffCallback(noteCallbackFunc callback) 
+    { 
+        _offNoteCallback = callback; 
+    }
+
+    void 
+    noteOnCallback(noteCallbackFunc callback) 
+    { 
+        _onNoteCallback = callback; 
+    }
+    
+    void 
+    controlChangeCallback(controlChangeCallbackFunc callback) 
+    { 
+        _controlChangeCallback = callback; 
+    }
+    
+    void 
+    programChangeCallback(programChangeCallbackFunc callback) 
+    { 
+        _programChangeCallback = callback; 
+    }
+    
+    void
+    pitchBendCallback(pitchBendCallbackFunc callback) 
+    { 
+        _pitchBendCallback = callback; 
+    }
+
+protected:
+    noteCallbackFunc _offNoteCallback;
+    noteCallbackFunc _onNoteCallback;
+    controlChangeCallbackFunc _controlChangeCallback;
+    programChangeCallbackFunc _programChangeCallback;
+    pitchBendCallbackFunc _pitchBendCallback;
 };
 
 }} //! midi::devices

@@ -6,7 +6,7 @@
 #include <Arduino.h>
 #include <SPI.h>
 
-#include "devices::dac.h"
+#include "devices::dac::DAC.h"
 
 // Select DAC A
 #define MSP4X22_DAC_A      0b00000000

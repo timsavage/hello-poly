@@ -31,13 +31,13 @@ public:
     // A pitch bend can be applied.
     //
     void
-    transpose(uint8_t note, int16_t bend=0)
+    transpose(uint8_t note, int16_t bend=0);
     
     //
     // Release a key
     //
     void
-    release(uint8_t note);
+    release(void);
 
 private:
     devices::dac::DAC *_dac;

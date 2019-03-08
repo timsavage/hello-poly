@@ -1,7 +1,6 @@
 /**
  * MIDI Device support for serial UART
  */
-#pragma once
 
 #include "devices::midi::Serial.h"
 
@@ -54,7 +53,7 @@ SerialMIDI::loop(void)
         case 2:
             // Set indicator
             _dataTimeout = millis() + 50;
-            digitalWrite(PC13, 1);
+            digitalWrite(PC13, 0);
 
             // Third phase (low byte)
             _phase = 0;
@@ -67,7 +66,7 @@ SerialMIDI::loop(void)
 
     if (_dataTimeout && (_dataTimeout < millis())) {
         _dataTimeout = 0;
-        digitalWrite(PC13, 0);
+        digitalWrite(PC13, 1);
     }
 }
 
@@ -76,15 +75,30 @@ SerialMIDI::handleMessage(void)
 {
     switch (_command) {
     case NoteOff:
-        Serial.print("Channel: "); Serial.print(_channel);
-        Serial.print("; NoteOff; Note: "); Serial.print(_highByte); 
-        Serial.print("; Velocity: "); Serial.println(_lowByte);
+        if (_offNoteCallback) {
+            _offNoteCallback(_channel, _highByte, _lowByte);
+        }
         break;
 
     case NoteOn:
+        if (_onNoteCallback) {
+            _onNoteCallback(_channel, _highByte, _lowByte);
+        }    
+        break;
+
+    case ControlChange:
+        break;
+
+    case ProgramChange:
+        break;
+
+    case PitchBend:
+        break;
+
+    default:
         Serial.print("Channel: "); Serial.print(_channel);
-        Serial.print("; NoteOn; Note: "); Serial.print(_highByte); 
-        Serial.print("; Velocity: "); Serial.println(_lowByte);
+        Serial.print("; HighByte: "); Serial.print(_highByte); 
+        Serial.print("; LowByte: "); Serial.println(_lowByte);
         break;
     }
 }

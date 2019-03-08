@@ -4,7 +4,7 @@
  */
 #pragma once
 
-#include "core::polyphony.h"
+#include "core::polyphony::Polyphony.h"
 
 namespace core {
 namespace polyphony {

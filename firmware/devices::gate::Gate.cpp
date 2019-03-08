@@ -1,6 +1,6 @@
-#include "core::gate::Gate.h"
+#include "devices::gate::Gate.h"
 
-using namespace core::gate;
+using namespace devices::gate;
 
 
 Gate::Gate(int pin)
@@ -22,7 +22,7 @@ Gate::reset(void)
 void
 Gate::open(void)
 {
-    digialWrite(_pin, 0);
+    digitalWrite(_pin, 0);
 }
 
 void

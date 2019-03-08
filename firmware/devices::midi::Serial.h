@@ -5,7 +5,7 @@
 
 #include <Arduino.h>
 
-#include "devices::midi.h"
+#include "devices::midi::Midi.h"
 
 namespace devices {
 namespace midi {

@@ -2,13 +2,12 @@
 
 using namespace core::polyphony;
 
-#define NULL_NOTE 255
-
 Mono::Mono(Key *key)
 : _key(key),
   _currentNote(NULL_NOTE)
 {}
 
+void
 Mono::noteOn(uint8_t note, uint8_t velocity)
 {
     if (_currentNote == NULL_NOTE) {
@@ -19,6 +18,7 @@ Mono::noteOn(uint8_t note, uint8_t velocity)
     _currentNote = note;
 }
 
+void
 Mono::noteOff(uint8_t note, uint8_t velocity)
 {
     if (_currentNote == note) {
@@ -27,8 +27,8 @@ Mono::noteOff(uint8_t note, uint8_t velocity)
     }
 }
 
-Mono::pitchBend(uint16_t amount)
+void
+Mono::pitchBend(int16_t amount)
 {
 
 }
-
