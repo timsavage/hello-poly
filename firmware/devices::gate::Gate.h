@@ -39,6 +39,12 @@ public:
     begin(void);
 
     //
+    // Reset gate
+    //
+    void
+    reset(void);
+
+    //
     // Open the gate
     //
     void

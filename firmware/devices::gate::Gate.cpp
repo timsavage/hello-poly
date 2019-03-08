@@ -14,6 +14,12 @@ Gate::begin(void)
 }
 
 void
+Gate::reset(void)
+{
+    digitalWrite(_pin, 0);
+}
+
+void
 Gate::open(void)
 {
     digialWrite(_pin, 0);
