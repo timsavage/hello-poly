@@ -1,10 +1,15 @@
 /**
- * Mono Polyphonic
- * 
+ * Mono Model
+ * ~~~~~~~~~~
+ *
+ * The Mono polyphony model is where only one note per channel is used. This
+ * is not really polyphony at all but a fallback to the simplest model.
+ *
  */
 #pragma once
 
-#include "core::polyphony.h"
+#include "core::Key.h"
+#include "core::polyphony::Polyphony.h"
 
 namespace core {
 namespace polyphony {
@@ -12,20 +17,21 @@ namespace polyphony {
 class Mono : public Polyphony
 {
 public:
-    Mono();
+    Mono(Key *key);
 
     void
-    on_note_on(uint8_t note, uint8_t velocity);
+    noteOn(uint8_t note, uint8_t velocity);
 
     void
-    on_note_off(uint8_t note, uint8_t velocity);
+    noteOff(uint8_t note, uint8_t velocity);
 
     void
-    on_pitch_bend(int16_t range);
+    pitchBend(int16_t amount);
 
 private:
+    Key *_key;
     uint8_t _currentNote;
-
 };
 
-}} //! polyphony::core
+}}  // !polyphony::core
+

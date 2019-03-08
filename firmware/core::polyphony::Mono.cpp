@@ -4,27 +4,31 @@ using namespace core::polyphony;
 
 #define NULL_NOTE 255
 
-
-Mono::Mono() 
-: _currentNote(NULL_NOTE)
+Mono::Mono(Key *key)
+: _key(key),
+  _currentNote(NULL_NOTE)
 {}
 
-void
-Mono::on_note_on(uint8_t note, uint8_t velocity)
+Mono::noteOn(uint8_t note, uint8_t velocity)
 {
-    if (_currentNote != note) {
-
+    if (_currentNote == NULL_NOTE) {
+        _key->press(note);
+    } else {
+        _key->transpose(note);
     }
+    _currentNote = note;
 }
 
-void
-Mono::on_note_off(uint8_t note, uint8_t velocity)
+Mono::noteOff(uint8_t note, uint8_t velocity)
 {
     if (_currentNote == note) {
         _currentNote = NULL_NOTE;
+        _key->release();
     }
 }
 
-void
-Mono::on_pitch_bend(int16_t range)
-{}
+Mono::pitchBend(uint16_t amount)
+{
+
+}
+
