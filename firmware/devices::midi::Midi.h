@@ -38,6 +38,8 @@ typedef void (*oneWordCallbackFunc)(uint8_t channel, int16_t);
 class MIDI
 {
 public:
+    MIDI();
+    
     virtual void 
     begin(void) = 0;
 
@@ -45,79 +47,35 @@ public:
     loop(void) = 0;
 
     void 
-    noteOffCallback(twoByteCallbackFunc callback) 
-    { 
-        _noteOffCallback = callback; 
-    }
+    noteOffCallback(twoByteCallbackFunc callback);
 
     void 
-    noteOnCallback(twoByteCallbackFunc callback) 
-    { 
-        _noteOnCallback = callback; 
-    }
+    noteOnCallback(twoByteCallbackFunc callback);
     
     void 
-    controlChangeCallback(twoByteCallbackFunc callback) 
-    { 
-        _controlChangeCallback = callback; 
-    }
+    controlChangeCallback(twoByteCallbackFunc callback);
     
     void 
-    programChangeCallback(oneByteCallbackFunc callback) 
-    { 
-        _programChangeCallback = callback; 
-    }
+    programChangeCallback(oneByteCallbackFunc callback);
     
     void
-    pitchBendCallback(oneWordCallbackFunc callback) 
-    { 
-        _pitchBendCallback = callback; 
-    }
+    pitchBendCallback(oneWordCallbackFunc callback);
 
 protected:
     void
-    handleMessage(Command command, uint8_t channel, uint8_t high, uint8_t low)
-    {
-        switch (command) {
-        case NoteOff:
-            if (_noteOffCallback) {
-                _noteOffCallback(channel, high, low);
-            }
-            break;
+    handleByte(uint8_t buffer);
 
-        case NoteOn:
-            if (_noteOnCallback) {
-                _noteOnCallback(channel, high, low);
-            }    
-            break;
+private:
+    void
+    handleMessage(void);
 
-        case ControlChange:
-            if (_controlChangeCallback) {
-                _controlChangeCallback(channel, high, low);
-            }
-            break;
+    uint8_t _phase;
+    Command _command;
+    uint8_t _channel;
+    uint8_t _high;
+    uint8_t _low;
 
-        case ProgramChange:
-            if (_programChangeCallback) {
-                _programChangeCallback(channel, high);
-            }        
-            break;
-
-        case PitchBend:
-            if (_pitchBendCallback) {
-                _pitchBendCallback(channel, ((low & 0x7f) | ((high & 0x7f) << 7)) + MIDI_PITCHBEND_MIN);
-            }        
-            break;
-
-        default:
-            Serial.print("Command: "); Serial.print(command);
-            Serial.print("; Channel: "); Serial.print(channel);
-            Serial.print("; High: "); Serial.print(high); 
-            Serial.print("; Low: "); Serial.println(low);
-            break;
-        }
-    }
-
+    // Callback functions
     twoByteCallbackFunc _noteOffCallback;
     twoByteCallbackFunc _noteOnCallback;
     twoByteCallbackFunc _controlChangeCallback;
