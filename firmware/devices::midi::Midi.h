@@ -5,7 +5,10 @@
 namespace devices {
 namespace midi {
 
-enum MidiType
+#define MIDI_PITCHBEND_MIN      -8192
+#define MIDI_PITCHBEND_MAX      8191
+
+enum Command
 {
     InvalidType           = 0x00,    // For notifying errors
     NoteOff               = 0x80,    // Note Off
@@ -28,10 +31,9 @@ enum MidiType
     SystemReset           = 0xFF,    // System Real Time - System Reset
 };
 
-typedef void (*noteCallbackFunc)(uint8_t channel, uint8_t note, uint8_t velocity);
-typedef void (*controlChangeCallbackFunc)(uint8_t channel, uint8_t control, uint8_t value);
-typedef void (*programChangeCallbackFunc)(uint8_t channel, uint8_t program);
-typedef void (*pitchBendCallbackFunc)(uint8_t channel, int16_t change);
+typedef void (*twoByteCallbackFunc)(uint8_t channel, uint8_t, uint8_t);
+typedef void (*oneByteCallbackFunc)(uint8_t channel, uint8_t);
+typedef void (*oneWordCallbackFunc)(uint8_t channel, int16_t);
 
 class MIDI
 {
@@ -43,41 +45,84 @@ public:
     loop(void) = 0;
 
     void 
-    noteOffCallback(noteCallbackFunc callback) 
+    noteOffCallback(twoByteCallbackFunc callback) 
     { 
-        _offNoteCallback = callback; 
+        _noteOffCallback = callback; 
     }
 
     void 
-    noteOnCallback(noteCallbackFunc callback) 
+    noteOnCallback(twoByteCallbackFunc callback) 
     { 
-        _onNoteCallback = callback; 
+        _noteOnCallback = callback; 
     }
     
     void 
-    controlChangeCallback(controlChangeCallbackFunc callback) 
+    controlChangeCallback(twoByteCallbackFunc callback) 
     { 
         _controlChangeCallback = callback; 
     }
     
     void 
-    programChangeCallback(programChangeCallbackFunc callback) 
+    programChangeCallback(oneByteCallbackFunc callback) 
     { 
         _programChangeCallback = callback; 
     }
     
     void
-    pitchBendCallback(pitchBendCallbackFunc callback) 
+    pitchBendCallback(oneWordCallbackFunc callback) 
     { 
         _pitchBendCallback = callback; 
     }
 
 protected:
-    noteCallbackFunc _offNoteCallback;
-    noteCallbackFunc _onNoteCallback;
-    controlChangeCallbackFunc _controlChangeCallback;
-    programChangeCallbackFunc _programChangeCallback;
-    pitchBendCallbackFunc _pitchBendCallback;
+    void
+    handleMessage(Command command, uint8_t channel, uint8_t high, uint8_t low)
+    {
+        switch (command) {
+        case NoteOff:
+            if (_noteOffCallback) {
+                _noteOffCallback(channel, high, low);
+            }
+            break;
+
+        case NoteOn:
+            if (_noteOnCallback) {
+                _noteOnCallback(channel, high, low);
+            }    
+            break;
+
+        case ControlChange:
+            if (_controlChangeCallback) {
+                _controlChangeCallback(channel, high, low);
+            }
+            break;
+
+        case ProgramChange:
+            if (_programChangeCallback) {
+                _programChangeCallback(channel, high);
+            }        
+            break;
+
+        case PitchBend:
+            if (_pitchBendCallback) {
+                _pitchBendCallback(channel, ((low & 0x7f) | ((high & 0x7f) << 7)) + MIDI_PITCHBEND_MIN);
+            }        
+            break;
+
+        default:
+            Serial.print("Command: "); Serial.print(command);
+            Serial.print("; Channel: "); Serial.print(channel);
+            Serial.print("; High: "); Serial.print(high); 
+            Serial.print("; Low: "); Serial.println(low);
+            break;
+        }
+    }
+
+    twoByteCallbackFunc _noteOffCallback;
+    twoByteCallbackFunc _noteOnCallback;
+    twoByteCallbackFunc _controlChangeCallback;
+    oneByteCallbackFunc _programChangeCallback;
+    oneWordCallbackFunc _pitchBendCallback;
 };
 
 }} //! midi::devices

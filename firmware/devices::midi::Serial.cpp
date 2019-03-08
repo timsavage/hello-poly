@@ -17,9 +17,9 @@ SerialMIDI::SerialMIDI(HardwareSerial *serial)
   _phase(0),
   _dataTimeout(0),
   _channel(0),
-  _command(0),
-  _highByte(0),
-  _lowByte(0)
+  _command(InvalidType),
+  _high(0),
+  _low(0)
 {}
 
 void
@@ -40,14 +40,14 @@ SerialMIDI::loop(void)
             if (_buffer & MIDI_STATUS_BYTE) {
                 _phase = 1;
                 _channel = _buffer & MIDI_CHANNEL_MASK;
-                _command = _buffer & MIDI_COMMAND_MASK;
+                _command = (Command)(_buffer & MIDI_COMMAND_MASK);
             }
             break;
 
         case 1:
             // Second phase (high byte)
             _phase = 2;
-            _highByte = _buffer;
+            _high = _buffer;
             break;
 
         case 2:
@@ -57,9 +57,9 @@ SerialMIDI::loop(void)
 
             // Third phase (low byte)
             _phase = 0;
-            _lowByte = _buffer;
+            _low = _buffer;
 
-            handleMessage();
+            handleMessage(_command, _channel, _high, _low);
             break;
         }
     }
@@ -67,38 +67,5 @@ SerialMIDI::loop(void)
     if (_dataTimeout && (_dataTimeout < millis())) {
         _dataTimeout = 0;
         digitalWrite(PC13, 1);
-    }
-}
-
-void
-SerialMIDI::handleMessage(void)
-{
-    switch (_command) {
-    case NoteOff:
-        if (_offNoteCallback) {
-            _offNoteCallback(_channel, _highByte, _lowByte);
-        }
-        break;
-
-    case NoteOn:
-        if (_onNoteCallback) {
-            _onNoteCallback(_channel, _highByte, _lowByte);
-        }    
-        break;
-
-    case ControlChange:
-        break;
-
-    case ProgramChange:
-        break;
-
-    case PitchBend:
-        break;
-
-    default:
-        Serial.print("Channel: "); Serial.print(_channel);
-        Serial.print("; HighByte: "); Serial.print(_highByte); 
-        Serial.print("; LowByte: "); Serial.println(_lowByte);
-        break;
     }
 }

@@ -22,9 +22,6 @@ public:
     loop(void);
 
 private:
-    void
-    handleMessage(void);
-
     HardwareSerial *_serial;
 
     // Status of reading
@@ -33,10 +30,10 @@ private:
     uint32_t _dataTimeout;
 
     // Current message
+    Command _command;
     uint8_t _channel;
-    uint8_t _command;
-    uint8_t _highByte;
-    uint8_t _lowByte;
+    uint8_t _high;
+    uint8_t _low;
 };
 
 }}  //! midi::devices
