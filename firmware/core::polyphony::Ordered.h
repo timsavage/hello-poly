@@ -12,9 +12,9 @@ namespace polyphony {
 
 enum OrderedMode
 {
-    FIFO,   // First in first out
-    LIFO,   // Last in first out
-    Limit,  // Limit (if all notes are used ignore new items)
+    ModeFIFO,   // First in first out
+    ModeLIFO,   // Last in first out
+    ModeLimit,  // Limit (if all notes are used ignore new items)
 };
 
 
@@ -35,7 +35,6 @@ public:
 private:
     OrderedMode _mode;
     uint8_t _notes[MAX_POLYBUFFER];
-    
 };
 
 }} //! polyphony::core

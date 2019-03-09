@@ -4,12 +4,12 @@ using namespace core::polyphony;
 
 Ordered::Ordered(OrderedMode mode)
 : _mode(mode)
-{    
-}
+{}
 
 void
 Ordered::noteOff(uint8_t note, uint8_t velocity)
 {
+
 }
 
 void
@@ -27,4 +27,6 @@ Ordered::noteOn(uint8_t note, uint8_t velocity)
 
 void
 Ordered::pitchBend(int16_t range)
-{}
+{
+
+}
