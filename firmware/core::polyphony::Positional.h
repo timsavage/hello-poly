@@ -5,33 +5,42 @@
 #pragma once
 
 #include "core::polyphony::Polyphony.h"
+#include "core::Key.h"
 
 namespace core {
 namespace polyphony {
 
-typedef enum PositionalMode
+enum PositionalMode
 {
-    Low,
-    High,
+    // Lowest notes are given priority
+    ModeLow,
+    // Highest notes are given priority
+    ModeHigh,
 };
 
-
+//
+// Positional Polyphony Model
+//
 class Positional : public Polyphony
 {
 public:
-    Positional(PositionalMode mode);
+    Positional(core::Key** keys, size_t keyCount, PositionalMode mode=ModeLow);
 
     void
-    on_note_on(uint8_t note, uint8_t velocity);
+    noteOff(uint8_t note, uint8_t velocity);
 
     void
-    on_note_off(uint8_t note, uint8_t velocity);
+    noteOn(uint8_t note, uint8_t velocity);
 
     void
-    on_pitch_bend(int16_t range);
+    pitchBend(int16_t amount);
 
 private:
+    core::Key **_keys;
+    size_t _keyCount;
     PositionalMode _mode;
+
+    uint8_t _notes[MAX_NOTES + 1];
 };
 
 }} //! polyphony::core
