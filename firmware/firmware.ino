@@ -10,6 +10,8 @@
 #include "core::Key.h"
 #include "core::polyphony::Polyphony.h"
 #include "core::polyphony::Mono.h"
+#include "core::polyphony::Ordered.h"
+#include "core::polyphony::Positional.h"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -36,88 +38,129 @@ core::Key key0(&dac0, &gate0);
 core::Key key1(&dac1, &gate1);
 core::Key key2(&dac2, &gate2);
 core::Key key3(&dac3, &gate3);
+core::Key *keyList[] = {&key0, &key1, &key2, &key3};
 
-core::polyphony::Polyphony *models[4] = {NULL, NULL, NULL, NULL};
+typedef struct {
+    uint8_t channel;
+    core::polyphony::Polyphony *model;
+} Route;
+
+Route routeTable[4] = {
+    {255, NULL},
+    {255, NULL},
+    {255, NULL},
+    {255, NULL},
+};
+
 
 /// Initialisation code //////////////////////////////////////////////////////
 
 void 
 setupDevices(void)
 {
-  Wire.begin();
-  SPI.begin();
+    Wire.begin();
+    SPI.begin();
 
-  // Initialise DACs
-  for (size_t i = 0; i < ARRAY_SIZE(dacList); i++) {
-    dacList[i]->begin();
-  }
+    // Initialise DACs
+    for (size_t i = 0; i < ARRAY_SIZE(dacList); i++) {
+        dacList[i]->begin();
+    }
 
-  // Initialise gates
-  for (size_t i = 0; i < ARRAY_SIZE(gateList); i++) {
-    gateList[i]->begin();
-    gateList[i]->reset();
-  }
+    // Initialise gates
+    for (size_t i = 0; i < ARRAY_SIZE(gateList); i++) {
+        gateList[i]->begin();
+        gateList[i]->reset();
+    }
 
-  midi.begin();
-  // delay(500);
-  // display.begin(SSD1306_SWITCHCAPVCC, 0x3C)
+    midi.begin();
+    // delay(500);
+    // display.begin(SSD1306_SWITCHCAPVCC, 0x3C)
 }
 
 void
 setupProgram(void)
 {
-  models[0] = new core::polyphony::Mono(&key0);
-  models[1] = new core::polyphony::Mono(&key1);
+    routeTable[0].channel = 0;
+    routeTable[0].model = new core::polyphony::Mono(&key0);
+
+    routeTable[1].channel = 1;
+    routeTable[1].model = new core::polyphony::Positional(&keyList[1], 3);
 }
 
 void
 onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
 {
-  if (channel == 0) {
-    models[0]->noteOff(note, velocity);
-  }
-  if (channel == 1) {
-    models[1]->noteOff(note, velocity);
-  }
+    Route *route;
+    for (size_t idx = 0; idx < 4; idx++) {
+        route = &routeTable[idx];
+        if (route->channel == channel) {
+            route->model->noteOff(note, velocity);
+        }
+    }
 }
 
 void
 onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
 {
-  if (channel == 0) {
-    models[0]->noteOn(note, velocity);
-  }
-  if (channel == 1) {
-    models[1]->noteOn(note, velocity);
-  }
+    Route *route;
+    for (size_t idx = 0; idx < 4; idx++) {
+        route = &routeTable[idx];
+        if (route->channel == channel) {
+            route->model->noteOn(note, velocity);
+        }
+    }
+}
+
+void
+onPitchBend(uint8_t channel, int16_t change)
+{
+    Serial.print("Pitch bend: "); Serial.println(change);
+}
+
+void
+onControlChange(uint8_t channel, uint8_t control, uint8_t value)
+{
+    Serial.print("Channel: "); Serial.print(channel);
+    Serial.print("; Control: "); Serial.print(control, HEX); 
+    Serial.print("; Value: "); Serial.println(value);  
+}
+
+void
+onProgramChange(uint8_t channel, uint8_t program)
+{
+    Serial.print("Channel: "); Serial.print(channel);
+    Serial.print("; Program: "); Serial.println(program);
 }
 
 void 
 setup(void) 
 {
-  // Set up the built-in LED pin as an output:
-  pinMode(PC13, OUTPUT);
+    // Set up the built-in LED pin as an output:
+    pinMode(PC13, OUTPUT);
 
-  Serial.begin(115200);
-  
-  setupDevices();
-  setupProgram();
+    Serial.begin(115200);
+    
+    setupDevices();
+    setupProgram();
 
-  midi.noteOffCallback(&onNoteOff);
-  midi.noteOnCallback(&onNoteOn);
+    midi.noteOffCallback(&onNoteOff);
+    midi.noteOnCallback(&onNoteOn);
+    midi.controlChangeCallback(&onControlChange);
+    midi.programChangeCallback(&onProgramChange);
+    //midi.pitchBendCallback(&onPitchBend);
 
-  // devices::display.clearDisplay();
-  // devices::display.setCursor(0, 0);
-  // devices::display.setTextSize(2);
-  // devices::display.setTextColor(WHITE);
-  // devices::display.print("Savage\nCompany 2");
-  // devices::display.display();
+    // devices::display.clearDisplay();
+    // devices::display.setCursor(0, 0);
+    // devices::display.setTextSize(2);
+    // devices::display.setTextColor(WHITE);
+    // devices::display.print("Savage\nCompany 2");
+    // devices::display.display();
 
-  Serial.print("Started...");
+    Serial.print("Started...");
 }
 
 void 
 loop(void) 
 {
-  midi.loop();
+    midi.loop();
 }
