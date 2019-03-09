@@ -21,28 +21,38 @@ const int noteCount = 99;
 
 
 Key::Key(dac::DAC *dac, gate::Gate *gate)
-: _dac(dac),
+: _note(255),
+  _dac(dac),
   _gate(gate)
 {}
 
 void
 Key::press(uint8_t note, int16_t bend)
 {
-  if (_gate->getState()) {
-    _gate->bounce();
-  } else {
-    _gate->close();
-  }
+    _note = note;
+    if (_gate->getState()) {
+        _gate->bounce();
+    } else {
+        _gate->close();
+    }
 }
 
 void
 Key::transpose(uint8_t note, int16_t bend)
 {
-  _gate->close();
+    _note = note;
+    _gate->close();
 }
 
 void
 Key::release(void)
 {
-  _gate->open();
+    _note = 255;
+    _gate->open();
+}
+
+uint8_t
+Key::getNote(void)
+{
+    return _note;
 }

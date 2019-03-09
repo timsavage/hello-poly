@@ -39,7 +39,14 @@ public:
     void
     release(void);
 
+    // 
+    // Get the current note
+    //
+    uint8_t
+    getNote(void);
+
 private:
+    uint8_t _note;
     devices::dac::DAC *_dac;
     devices::gate::Gate *_gate;
 
