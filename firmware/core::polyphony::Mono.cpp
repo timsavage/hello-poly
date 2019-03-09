@@ -3,26 +3,19 @@
 using namespace core::polyphony;
 
 Mono::Mono(Key *key)
-: _key(key),
-  _currentNote(NULL_NOTE)
+: _key(key)
 {}
 
 void
 Mono::noteOn(uint8_t note, uint8_t velocity)
 {
-    if (_currentNote == NULL_NOTE) {
-        _key->press(note);
-    } else {
-        _key->transpose(note);
-    }
-    _currentNote = note;
+    _key->press(note);
 }
 
 void
 Mono::noteOff(uint8_t note, uint8_t velocity)
 {
-    if (_currentNote == note) {
-        _currentNote = NULL_NOTE;
+    if (_key->getNote() == note) {
         _key->release();
     }
 }

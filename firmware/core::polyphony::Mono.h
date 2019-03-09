@@ -30,7 +30,6 @@ public:
 
 private:
     Key *_key;
-    uint8_t _currentNote;
 };
 
 }}  // !polyphony::core
