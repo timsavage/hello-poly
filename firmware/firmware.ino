@@ -2,6 +2,8 @@
 #include <Wire.h>
 #include <SPI.h>
 
+#include "config.h"
+
 #include "devices::dac::DAC.h"
 #include "devices::dac::MSP4X2X.h"
 #include "devices::gate::Gate.h"
@@ -16,12 +18,18 @@
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 // Define DACs
-devices::dac::MSP4X22 dac0(PA3, MSP4X22_DAC_A);
-devices::dac::MSP4X22 dac1(PA3, MSP4X22_DAC_B);
-devices::dac::MSP4X22 dac2(PA4, MSP4X22_DAC_A);
-devices::dac::MSP4X22 dac3(PA4, MSP4X22_DAC_B);
-devices::dac::MSP4X22 dac4(PA5, MSP4X22_DAC_A);
-devices::dac::MSP4X22 dac5(PA5, MSP4X22_DAC_B);
+// devices::dac::MSP4X22 dac0(PA3, MSP4X22_DAC_A);
+// devices::dac::MSP4X22 dac1(PA3, MSP4X22_DAC_B);
+// devices::dac::MSP4X22 dac2(PA4, MSP4X22_DAC_A);
+// devices::dac::MSP4X22 dac3(PA4, MSP4X22_DAC_B);
+// devices::dac::MSP4X22 dac4(PA5, MSP4X22_DAC_A);
+// devices::dac::MSP4X22 dac5(PA5, MSP4X22_DAC_B);
+devices::dac::MockDAC dac0;
+devices::dac::MockDAC dac1;
+devices::dac::MockDAC dac2;
+devices::dac::MockDAC dac3;
+devices::dac::MockDAC dac4;
+devices::dac::MockDAC dac5;
 devices::dac::DAC *dacList[] = {&dac0, &dac1, &dac2, &dac3, &dac4, &dac5};
 
 // Define devices
@@ -45,7 +53,7 @@ typedef struct {
     core::polyphony::Polyphony *model;
 } Route;
 
-Route routeTable[4] = {
+Route routeTable[MAX_NOTES] = {
     {255, NULL},
     {255, NULL},
     {255, NULL},
@@ -91,7 +99,7 @@ void
 onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
 {
     Route *route;
-    for (size_t idx = 0; idx < 4; idx++) {
+    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
         route = &routeTable[idx];
         if (route->channel == channel) {
             route->model->noteOff(note, velocity);
@@ -103,7 +111,7 @@ void
 onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
 {
     Route *route;
-    for (size_t idx = 0; idx < 4; idx++) {
+    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
         route = &routeTable[idx];
         if (route->channel == channel) {
             route->model->noteOn(note, velocity);
