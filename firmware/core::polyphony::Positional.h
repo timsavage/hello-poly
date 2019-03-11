@@ -6,6 +6,7 @@
 
 #include "core::polyphony::Polyphony.h"
 #include "core::Key.h"
+#include "core::KeyList.h"
 
 namespace core {
 namespace polyphony {
@@ -36,8 +37,7 @@ public:
     pitchBend(int16_t amount);
 
 private:
-    core::Key **_keys;
-    size_t _keyCount;
+    KeyList _keyList;
     PositionalMode _mode;
 
     uint8_t _notes[MAX_NOTES + 1];
