@@ -1,8 +1,8 @@
-##############################
-Hello Poly - MIDI2CV interface
-##############################
+############################################
+Hello Poly - Polyphonic MIDI to CV interface
+############################################
 
-Polyphonic MIDI to CV module for modular synths, designed primarily for Eurorack systems but this is not a limitation.
+Polyphonic MIDI to CV module for modular synths, designed primarily for (but not limited to) Eurorack systems.
 
 Features:
 
@@ -12,5 +12,10 @@ Features:
 - Fully assignable routing of MIDI messages by channel and
 - Multiple Polyphony modes (mono, Order based, Position based)
 - Support for multiple programs (controlled via program change events)
+- All configuration via MIDI.
 
 Hardware
+
+- Designed around an 32 bit ARM STM module
+- Using MSP4822 12bit DACs
+- Supporting an SSD1306 OLED display
