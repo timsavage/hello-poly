@@ -14,10 +14,20 @@
 namespace core {
 namespace polyphony {
 
+enum MonoMode
+{
+    // Press a new note
+    ModePress,
+    // Transpose to a new note
+    ModeTranspose,
+    // A second note is ignored
+    ModeSingle,
+};
+
 class Mono : public Polyphony
 {
 public:
-    Mono(Key *key);
+    Mono(Key *key, MonoMode mode=ModePress);
 
     void
     noteOn(uint8_t note, uint8_t velocity);
@@ -30,6 +40,7 @@ public:
 
 private:
     Key *_key;
+    MonoMode _mode;
 };
 
 }}  // !polyphony::core

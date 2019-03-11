@@ -2,14 +2,29 @@
 
 using namespace core::polyphony;
 
-Mono::Mono(Key *key)
-: _key(key)
+Mono::Mono(Key *key, MonoMode mode)
+: _key(key),
+  _mode(mode)
 {}
 
 void
 Mono::noteOn(uint8_t note, uint8_t velocity)
 {
-    _key->press(note);
+    switch(_mode) {
+    case ModeSingle:
+        if (_key->getNote() == NULL_NOTE) {
+            _key->press(note);
+        }
+        break;
+    
+    case ModePress:
+        _key->press(note);
+        break;
+
+    case ModeTranspose:
+        _key->transpose(note);
+    }
+    
 }
 
 void
