@@ -20,34 +20,42 @@ const int noteMap[] = {
 const int noteCount = 99;
 
 
-Key::Key(dac::DAC *dac, gate::Gate *gate)
-: _note(255),
-  _dac(dac),
-  _gate(gate)
+Key::Key(dac::DAC *dac, gate::Gate *gate, uint8_t offset, uint16_t bounce_ms)
+: _dac(dac),
+  _gate(gate),
+  _offset(offset),
+  _bounce_ms(bounce_ms),
+  _note(NULL_NOTE),
+  _step(0)
 {}
 
 void
 Key::press(uint8_t note, int16_t bend)
 {
     _note = note;
+    _step = noteMap[note - _offset];
     if (_gate->getState()) {
-        _gate->bounce();
-    } else {
-        _gate->close();
+        _gate->open();
+        delay(_bounce_ms);
     }
+    _dac->setValue(_step);
+    _gate->close();
 }
 
 void
 Key::transpose(uint8_t note, int16_t bend)
 {
     _note = note;
+    _step = noteMap[note - _offset];
+    _dac->setValue(_step);
     _gate->close();
 }
 
 void
 Key::release(void)
 {
-    _note = 255;
+    _note = NULL_NOTE;
+    _step = 0;
     _gate->open();
 }
 
@@ -55,4 +63,16 @@ uint8_t
 Key::getNote(void)
 {
     return _note;
+}
+
+uint16_t
+Key::getStep(void)
+{
+    return _step;
+}
+
+uint8_t
+Key::isReleased(void)
+{
+    return _note == NULL_NOTE;
 }
