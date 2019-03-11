@@ -12,12 +12,17 @@ namespace polyphony {
 
 enum OrderedMode
 {
-    ModeFIFO,   // First in first out
-    ModeLIFO,   // Last in first out
-    ModeLimit,  // Limit (if all notes are used ignore new items)
+    // First in first out
+    ModeFIFO,
+    // Last in first out
+    ModeLIFO,
+    // Limit (if all notes are used ignore new items)
+    ModeLimit,
 };
 
-
+//
+// Ordered Polyphony Model
+//
 class Ordered : public Polyphony
 {
 public:
