@@ -8,7 +8,17 @@
 namespace core {
 namespace polyphony {
 
-#define NULL_NOTE 255
+enum PolyphonyMode : uint8_t
+{
+    ModeMonoPress,
+    ModeMonoSingle,
+    ModeMonoTranspose,
+    ModeOrderedLIFO,
+    ModeOrderedFIFO,
+    ModeOrderedLimit,
+    ModePositionalLow,
+    ModePositionalHigh,
+};
 
 // 
 // ABC class that provides the interface for Polyphony models.

@@ -55,6 +55,8 @@ core::Key key2(&dac2, &gate2);
 core::Key key3(&dac3, &gate3);
 core::Key *keyList[] = {&key0, &key1, &key2, &key3};
 
+core::polyphony::PolyphonyMode currentMode;
+
 
 /// Initialisation code //////////////////////////////////////////////////////
 
@@ -156,9 +158,66 @@ onPitchBend(uint8_t channel, int16_t change)
 void
 onControlChange(uint8_t channel, uint8_t control, uint8_t value)
 {
-    Serial.print("Channel: "); Serial.print(channel);
-    Serial.print("; Control: "); Serial.print(control, HEX); 
-    Serial.print("; Value: "); Serial.println(value);  
+    if (control == 0x4b) {
+        core::polyphony::PolyphonyMode mode = (core::polyphony::PolyphonyMode)((value >> 2) % 8);
+        if (mode != currentMode) {
+            currentMode = mode;
+
+            switch(mode) {
+            case core::polyphony::ModeMonoPress:
+                Serial.println("Switch to mode MonoPress");
+                delete routeTable[0].model;
+                routeTable[0].model = new core::polyphony::MonoPress(&key0);
+                break;
+
+            case core::polyphony::ModeMonoSingle:
+                Serial.println("Switch to mode MonoSingle");
+                delete routeTable[0].model;
+                routeTable[0].model = new core::polyphony::MonoSingle(&key0);
+                break;
+
+            case core::polyphony::ModeMonoTranspose:
+                Serial.println("Switch to mode MonoTranspose");
+                delete routeTable[0].model;
+                routeTable[0].model = new core::polyphony::MonoTranspose(&key0);
+                break;
+
+            case core::polyphony::ModeOrderedLIFO:
+                Serial.println("Switch to mode OrderedLIFO");
+                delete routeTable[1].model;
+                routeTable[1].model = new core::polyphony::OrderedLIFO(&keyList[1], 3);
+                break;
+
+            case core::polyphony::ModeOrderedFIFO:
+                Serial.println("Switch to mode OrderedFIFO");
+                delete routeTable[1].model;
+                routeTable[1].model = new core::polyphony::OrderedFIFO(&keyList[1], 3);
+                break;
+
+            case core::polyphony::ModeOrderedLimit:
+                Serial.println("Switch to mode OrderedLimit");
+                delete routeTable[1].model;
+                routeTable[1].model = new core::polyphony::OrderedLimit(&keyList[1], 3);
+                break;
+
+            case core::polyphony::ModePositionalLow:
+                Serial.println("Switch to mode PositionalLow");
+                delete routeTable[1].model;
+                routeTable[1].model = new core::polyphony::PositionalLow(&keyList[1], 3);
+                break;
+
+            case core::polyphony::ModePositionalHigh:
+                Serial.println("Switch to mode PositionalHigh");
+                delete routeTable[1].model;
+                routeTable[1].model = new core::polyphony::PositionalHigh(&keyList[1], 3);
+                break;
+            }
+        }
+    } else {
+        Serial.print("Channel: "); Serial.print(channel);
+        Serial.print("; Control: "); Serial.print(control, HEX); 
+        Serial.print("; Value: "); Serial.println(value);  
+    }
 }
 
 void
