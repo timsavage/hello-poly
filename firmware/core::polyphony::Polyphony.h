@@ -29,6 +29,12 @@ public:
     noteOn(uint8_t note, uint8_t velocity) = 0;
 
     //
+    // Event generated when a MIDI after touch channel bend message is routed to model
+    //
+    virtual void
+    afterTouchChannel(uint8_t value) = 0;
+
+    //
     // Event generated when a MIDI pitch bend message is routed to model
     //
     virtual void
