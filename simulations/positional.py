@@ -40,15 +40,12 @@ class PositionLow(Position):
                 self.notes[idx] = note
 
         try:
-            idx = self.keys.index(NULL_NOTE)
+            idx = self.keys.index(self.notes[self.count])
         except ValueError:
-            try:
-                idx = self.keys.index(self.notes[self.count])
-            except:
-                idx = None
-
-        if idx is not None:
-            self.keys[idx] = note
+            pass
+        else:
+            if idx is not None:
+                self.keys[idx] = note
 
         self.notes[self.count] = NULL_NOTE
 
@@ -72,12 +69,27 @@ class PositionHigh(Position):
             if note > val or val == NULL_NOTE :
                 self.notes[idx + 1] = self.notes[idx]
                 self.notes[idx] = note
+
+        try:
+            idx = self.keys.index(self.notes[self.count])
+        except ValueError:
+            pass
+        else:
+            if idx is not None:
+                self.keys[idx] = note
+
         self.notes[self.count] = NULL_NOTE
 
     def note_off(self, note):
         for idx in range(self.count):
             if note >= self.notes[idx]:
                 self.notes[idx] = self.notes[idx + 1]
+        try:
+            idx = self.keys.index(note)
+        except ValueError:
+            pass
+        else:
+            self.keys[idx] = NULL_NOTE
 
 
 lo_model = PositionLow()
@@ -93,4 +105,3 @@ for press, note in key_events:
         action = 'Release'
 
     print(f"{action} [{note:02}] - Lo: {lo_model}; Hi: {hi_model}")
-
