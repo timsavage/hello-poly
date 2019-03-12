@@ -9,11 +9,18 @@
 #include "devices::gate::Gate.h"
 #include "devices::midi::Serial.h"
 
+#include "core::Control.h"
 #include "core::Key.h"
+
 #include "core::polyphony::Polyphony.h"
-#include "core::polyphony::Mono.h"
-#include "core::polyphony::Ordered.h"
-#include "core::polyphony::Positional.h"
+#include "core::polyphony::MonoPress.hpp"
+#include "core::polyphony::MonoSingle.hpp"
+#include "core::polyphony::MonoTranspose.hpp"
+#include "core::polyphony::OrderedFIFO.hpp"
+#include "core::polyphony::OrderedLIFO.hpp"
+#include "core::polyphony::OrderedLimit.hpp"
+#include "core::polyphony::PositionalHigh.hpp"
+#include "core::polyphony::PositionalLow.hpp"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -48,18 +55,6 @@ core::Key key2(&dac2, &gate2);
 core::Key key3(&dac3, &gate3);
 core::Key *keyList[] = {&key0, &key1, &key2, &key3};
 
-typedef struct {
-    uint8_t channel;
-    core::polyphony::Polyphony *model;
-} Route;
-
-Route routeTable[MAX_NOTES] = {
-    {255, NULL},
-    {255, NULL},
-    {255, NULL},
-    {255, NULL},
-};
-
 
 /// Initialisation code //////////////////////////////////////////////////////
 
@@ -85,14 +80,29 @@ setupDevices(void)
     // display.begin(SSD1306_SWITCHCAPVCC, 0x3C)
 }
 
+
+/// Message routing //////////////////////////////////////////////////////
+
+typedef struct {
+    uint8_t channel;
+    core::polyphony::Polyphony *model;
+} Route;
+
+Route routeTable[MAX_NOTES] = {
+    {255, NULL},
+    {255, NULL},
+    {255, NULL},
+    {255, NULL},
+};
+
 void
 setupProgram(void)
 {
     routeTable[0].channel = 0;
-    routeTable[0].model = new core::polyphony::Mono(&key0);
+    routeTable[0].model = new core::polyphony::MonoSingle(&key0);
 
     routeTable[1].channel = 1;
-    routeTable[1].model = new core::polyphony::Positional(&keyList[1], 3);
+    routeTable[1].model = new core::polyphony::OrderedLimit(&keyList[1], 3);
 }
 
 void
@@ -120,9 +130,27 @@ onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
 }
 
 void
+onAfterTouchChannel(uint8_t channel, uint8_t value)
+{
+    Route *route;
+    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
+        route = &routeTable[idx];
+        if (route->channel == channel) {
+            route->model->afterTouchChannel(value);
+        }
+    }
+}
+
+void
 onPitchBend(uint8_t channel, int16_t change)
 {
-    Serial.print("Pitch bend: "); Serial.println(change);
+    Route *route;
+    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
+        route = &routeTable[idx];
+        if (route->channel == channel) {
+            route->model->pitchBend(change);
+        }
+    }
 }
 
 void
@@ -155,6 +183,7 @@ setup(void)
     midi.noteOnCallback(&onNoteOn);
     midi.controlChangeCallback(&onControlChange);
     midi.programChangeCallback(&onProgramChange);
+    midi.afterTouchChannelCallback(&onAfterTouchChannel);
     //midi.pitchBendCallback(&onPitchBend);
 
     // devices::display.clearDisplay();
