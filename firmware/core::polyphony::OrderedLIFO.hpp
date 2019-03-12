@@ -22,19 +22,11 @@ public:
     void
     noteOff(uint8_t note, uint8_t velocity)
     {
-        Key *key = _keyList.find(note);
-        if (key != NULL) {
-            key->release();
-        }
     }
 
     void
     noteOn(uint8_t note, uint8_t velocity)
     {
-        Key *key = _keyList.firstOpen();
-        if (key != NULL) {
-            key->press(note);
-        }
     }
 
     void
