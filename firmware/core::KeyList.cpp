@@ -59,3 +59,14 @@ KeyList::count(void)
 {
     return _count;
 }
+
+//
+// Apply a pitch bend
+//
+void
+KeyList::pitchBend(int16_t amount)
+{
+    for (size_t idx; idx < _count; idx++) {
+        _keys[idx]->pitchBend(amount);
+    }
+}

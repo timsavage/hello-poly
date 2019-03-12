@@ -25,7 +25,7 @@ public:
     // A pitch bend can be applied.
     //
     void
-    press(uint8_t note, int16_t bend=0);
+    press(uint8_t note);
 
     //
     // Transpose a key (this will not retrigger, but will close the gate if required)
@@ -33,13 +33,19 @@ public:
     // A pitch bend can be applied.
     //
     void
-    transpose(uint8_t note, int16_t bend=0);
+    transpose(uint8_t note);
     
     //
     // Release a key
     //
     void
     release(void);
+
+    //
+    // Apply a pitch bend
+    //
+    void
+    pitchBend(int16_t amount);
 
     // 
     // Get the current note
@@ -66,6 +72,7 @@ private:
     uint16_t _bounce_ms;
     uint8_t _note;
     uint16_t _step;
+    int16_t _amount;
 };
 
 }  //! core

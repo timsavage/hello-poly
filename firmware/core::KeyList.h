@@ -40,6 +40,12 @@ public:
     size_t
     count(void);
 
+    //
+    // Apply a pitch bend
+    //
+    void
+    pitchBend(int16_t amount);
+
 private:
     Key **_keys;
     size_t _count;

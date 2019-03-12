@@ -26,11 +26,12 @@ Key::Key(dac::DAC *dac, gate::Gate *gate, uint8_t offset, uint16_t bounce_ms)
   _offset(offset),
   _bounce_ms(bounce_ms),
   _note(NULL_NOTE),
-  _step(0)
+  _step(0),
+  _amount(0)
 {}
 
 void
-Key::press(uint8_t note, int16_t bend)
+Key::press(uint8_t note)
 {
     _note = note;
     _step = noteMap[note - _offset];
@@ -43,7 +44,7 @@ Key::press(uint8_t note, int16_t bend)
 }
 
 void
-Key::transpose(uint8_t note, int16_t bend)
+Key::transpose(uint8_t note)
 {
     _note = note;
     _step = noteMap[note - _offset];
@@ -57,6 +58,12 @@ Key::release(void)
     _note = NULL_NOTE;
     _step = 0;
     _gate->open();
+}
+
+void
+Key::pitchBend(int16_t amount)
+{
+    _amount = amount;
 }
 
 uint8_t
