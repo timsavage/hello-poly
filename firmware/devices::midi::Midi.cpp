@@ -44,6 +44,12 @@ MIDI::programChangeCallback(oneByteCallbackFunc callback)
 }
 
 void
+MIDI::afterTouchChannelCallback(oneByteCallbackFunc callback)
+{
+    _afterTouchChannelCallback = callback;
+}
+
+void
 MIDI::pitchBendCallback(oneWordCallbackFunc callback) 
 { 
     _pitchBendCallback = callback; 
@@ -116,6 +122,12 @@ MIDI::handleMessage()
     case ProgramChange:
         if (_programChangeCallback) {
             _programChangeCallback(_channel, _high);
+        }        
+        break;
+
+    case AfterTouchChannel:
+        if (_afterTouchChannelCallback) {
+            _afterTouchChannelCallback(_channel, _high);
         }        
         break;
 

@@ -57,6 +57,9 @@ public:
     
     void 
     programChangeCallback(oneByteCallbackFunc callback);
+
+    void
+    afterTouchChannelCallback(oneByteCallbackFunc callback);
     
     void
     pitchBendCallback(oneWordCallbackFunc callback);
@@ -80,6 +83,7 @@ private:
     twoByteCallbackFunc _noteOnCallback;
     twoByteCallbackFunc _controlChangeCallback;
     oneByteCallbackFunc _programChangeCallback;
+    oneByteCallbackFunc _afterTouchChannelCallback;
     oneWordCallbackFunc _pitchBendCallback;
 };
 
