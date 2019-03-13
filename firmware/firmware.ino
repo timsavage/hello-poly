@@ -1,11 +1,13 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 #include "config.h"
 
 #include "devices::dac::DAC.h"
-#include "devices::dac::MSP4X2X.h"
+#include "devices::dac::MSP4X2X.hpp"
 #include "devices::gate::Gate.h"
 #include "devices::midi::Serial.h"
 
@@ -25,14 +27,14 @@
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
 // Define DACs
-// devices::dac::MSP4X22 dac0(PA3, MSP4X22_DAC_A);
-// devices::dac::MSP4X22 dac1(PA3, MSP4X22_DAC_B);
+devices::dac::MSP4X22 dac0(PA1, MSP4X22_DAC_A);
+devices::dac::MSP4X22 dac1(PA1, MSP4X22_DAC_B);
 // devices::dac::MSP4X22 dac2(PA4, MSP4X22_DAC_A);
 // devices::dac::MSP4X22 dac3(PA4, MSP4X22_DAC_B);
 // devices::dac::MSP4X22 dac4(PA5, MSP4X22_DAC_A);
 // devices::dac::MSP4X22 dac5(PA5, MSP4X22_DAC_B);
-devices::dac::MockDAC dac0;
-devices::dac::MockDAC dac1;
+// devices::dac::MockDAC dac0;
+// devices::dac::MockDAC dac1;
 devices::dac::MockDAC dac2;
 devices::dac::MockDAC dac3;
 devices::dac::MockDAC dac4;
@@ -47,7 +49,7 @@ devices::gate::Gate gate3(PB15);
 devices::gate::Gate *gateList[] = {&gate0, &gate1, &gate2, &gate3};
 
 devices::midi::SerialMIDI midi(&Serial2);
-// Adafruit_SSD1306 display;
+Adafruit_SSD1306 display;
 
 core::Key key0(&dac0, &gate0);
 core::Key key1(&dac1, &gate1);
@@ -78,8 +80,16 @@ setupDevices(void)
     }
 
     midi.begin();
-    // delay(500);
-    // display.begin(SSD1306_SWITCHCAPVCC, 0x3C)
+
+    // Delay Initialisation so device can stablise after power is applied.
+    delay(500);
+    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
+    display.setTextSize(2);
+    display.setTextColor(WHITE);
+    display.clearDisplay();
+    display.setCursor(0, 0);
+    display.print("Savage\nCompany");
+    display.display();
 }
 
 
@@ -132,13 +142,13 @@ onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
 }
 
 void
-onAfterTouchChannel(uint8_t channel, uint8_t value)
+onAfterTouch(uint8_t channel, uint8_t value)
 {
     Route *route;
     for (size_t idx = 0; idx < MAX_NOTES; idx++) {
         route = &routeTable[idx];
         if (route->channel == channel) {
-            route->model->afterTouchChannel(value);
+            route->model->afterTouch(value);
         }
     }
 }
@@ -162,56 +172,55 @@ onControlChange(uint8_t channel, uint8_t control, uint8_t value)
         core::polyphony::PolyphonyMode mode = (core::polyphony::PolyphonyMode)((value >> 2) % 8);
         if (mode != currentMode) {
             currentMode = mode;
+            core::polyphony::Polyphony *newModel = NULL;
 
             switch(mode) {
             case core::polyphony::ModeMonoPress:
-                Serial.println("Switch to mode MonoPress");
                 delete routeTable[0].model;
-                routeTable[0].model = new core::polyphony::MonoPress(&key0);
+                routeTable[0].model = newModel = new core::polyphony::MonoPress(&key0);
                 break;
 
             case core::polyphony::ModeMonoSingle:
-                Serial.println("Switch to mode MonoSingle");
                 delete routeTable[0].model;
-                routeTable[0].model = new core::polyphony::MonoSingle(&key0);
+                routeTable[0].model = newModel = new core::polyphony::MonoSingle(&key0);
                 break;
 
             case core::polyphony::ModeMonoTranspose:
-                Serial.println("Switch to mode MonoTranspose");
                 delete routeTable[0].model;
-                routeTable[0].model = new core::polyphony::MonoTranspose(&key0);
+                routeTable[0].model = newModel = new core::polyphony::MonoTranspose(&key0);
                 break;
 
             case core::polyphony::ModeOrderedLIFO:
-                Serial.println("Switch to mode OrderedLIFO");
                 delete routeTable[1].model;
-                routeTable[1].model = new core::polyphony::OrderedLIFO(&keyList[1], 3);
+                routeTable[1].model = newModel = new core::polyphony::OrderedLIFO(&keyList[1], 3);
                 break;
 
             case core::polyphony::ModeOrderedFIFO:
-                Serial.println("Switch to mode OrderedFIFO");
                 delete routeTable[1].model;
-                routeTable[1].model = new core::polyphony::OrderedFIFO(&keyList[1], 3);
+                routeTable[1].model = newModel = new core::polyphony::OrderedFIFO(&keyList[1], 3);
                 break;
 
             case core::polyphony::ModeOrderedLimit:
-                Serial.println("Switch to mode OrderedLimit");
                 delete routeTable[1].model;
-                routeTable[1].model = new core::polyphony::OrderedLimit(&keyList[1], 3);
+                routeTable[1].model = newModel = new core::polyphony::OrderedLimit(&keyList[1], 3);
                 break;
 
             case core::polyphony::ModePositionalLow:
-                Serial.println("Switch to mode PositionalLow");
                 delete routeTable[1].model;
-                routeTable[1].model = new core::polyphony::PositionalLow(&keyList[1], 3);
+                routeTable[1].model = newModel = new core::polyphony::PositionalLow(&keyList[1], 3);
                 break;
 
             case core::polyphony::ModePositionalHigh:
-                Serial.println("Switch to mode PositionalHigh");
                 delete routeTable[1].model;
-                routeTable[1].model = new core::polyphony::PositionalHigh(&keyList[1], 3);
+                routeTable[1].model = newModel = new core::polyphony::PositionalHigh(&keyList[1], 3);
                 break;
             }
+
+            Serial.print("Activate model: "); Serial.println(newModel->name());
+            display.clearDisplay();
+            display.setCursor(0, 0);
+            display.print("M: "); display.print(newModel->name());
+            display.display();
         }
     } else {
         Serial.print("Channel: "); Serial.print(channel);
@@ -242,15 +251,8 @@ setup(void)
     midi.noteOnCallback(&onNoteOn);
     midi.controlChangeCallback(&onControlChange);
     midi.programChangeCallback(&onProgramChange);
-    midi.afterTouchChannelCallback(&onAfterTouchChannel);
+    midi.afterTouchCallback(&onAfterTouch);
     //midi.pitchBendCallback(&onPitchBend);
-
-    // devices::display.clearDisplay();
-    // devices::display.setCursor(0, 0);
-    // devices::display.setTextSize(2);
-    // devices::display.setTextColor(WHITE);
-    // devices::display.print("Savage\nCompany 2");
-    // devices::display.display();
 
     Serial.print("Started...");
 }
