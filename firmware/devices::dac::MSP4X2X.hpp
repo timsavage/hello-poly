@@ -38,19 +38,28 @@
 namespace devices {
 namespace dac {
 
+const SPISettings dacSettings(16000000, MSBFIRST, SPI_MODE0);
+
 //
 // MSP4X22 DAC Device
 //
 class MSP4X22 : public DAC
 {
 public:
-    MSP4X22(int ss, byte subDac, byte config=MSP4X2X_UNBUFFERED | MSP4X2X_GAIN_2X | MSP4X2X_ENABLED);
+    MSP4X22(int ss, byte subDac, byte config=MSP4X2X_UNBUFFERED | MSP4X2X_GAIN_2X | MSP4X2X_ENABLED) : 
+        _ss(ss),
+        _config(subDac | config)
+    {}
 
     //
     // Begin and configure pins
     //
     void 
-    begin(void);
+    begin(void)
+    {
+        pinMode(_ss, OUTPUT);
+        digitalWrite(_ss, HIGH);
+    }
 
     //
     // Set DAC output value
@@ -58,7 +67,20 @@ public:
     // value - value to set, this is a 12-bit value (0-4095)
     //
     void
-    setValue(word value);
+    setValue(word value)
+    {
+        byte first = _config | (value & 0xF00) >> 8;
+        byte second = value & 0xFF;
+
+        SPI.beginTransaction(dacSettings);
+        digitalWrite(_ss, LOW);
+
+        SPI.transfer(first);
+        SPI.transfer(second);
+
+        digitalWrite(_ss, HIGH);
+        SPI.endTransaction();  
+    }
 
 private:
     int _ss;
