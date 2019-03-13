@@ -59,7 +59,7 @@ public:
     programChangeCallback(oneByteCallbackFunc callback);
 
     void
-    afterTouchChannelCallback(oneByteCallbackFunc callback);
+    afterTouchCallback(oneByteCallbackFunc callback);
     
     void
     pitchBendCallback(oneWordCallbackFunc callback);

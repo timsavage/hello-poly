@@ -44,7 +44,7 @@ MIDI::programChangeCallback(oneByteCallbackFunc callback)
 }
 
 void
-MIDI::afterTouchChannelCallback(oneByteCallbackFunc callback)
+MIDI::afterTouchCallback(oneByteCallbackFunc callback)
 {
     _afterTouchChannelCallback = callback;
 }
