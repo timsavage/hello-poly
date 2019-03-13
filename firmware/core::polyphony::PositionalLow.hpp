@@ -11,9 +11,6 @@
 namespace core {
 namespace polyphony {
 
-//
-// Positional Polyphony Model
-//
 class PositionalLow : public Polyphony
 {
 public:
@@ -21,6 +18,12 @@ public:
         _keyList(keys, keyCount)
     {
         memset(_notes, NULL_NOTE, MAX_NOTES + 1);
+    }
+
+    const char *
+    name(void) 
+    {
+        return "Chrd Lo";
     }
 
     void
@@ -69,7 +72,7 @@ public:
     }
 
     void
-    afterTouchChannel(uint8_t value)
+    afterTouch(uint8_t value)
     {
 
     }

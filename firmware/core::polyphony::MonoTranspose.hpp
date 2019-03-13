@@ -21,6 +21,12 @@ public:
         _key(key)
     {}
 
+    const char *
+    name(void) 
+    {
+        return "Trans";
+    }
+
     void
     noteOn(uint8_t note, uint8_t velocity)
     {
@@ -36,7 +42,7 @@ public:
     }
 
     void
-    afterTouchChannel(uint8_t value)
+    afterTouch(uint8_t value)
     {
 
     }

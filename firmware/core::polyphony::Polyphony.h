@@ -26,6 +26,12 @@ enum PolyphonyMode : uint8_t
 class Polyphony
 {
 public:
+    //
+    // Name of polyphony model
+    //
+    virtual const char *
+    name(void) = 0;
+
     // 
     // Event generated when a MIDI note off message is routed to model
     //
@@ -42,7 +48,7 @@ public:
     // Event generated when a MIDI after touch channel bend message is routed to model
     //
     virtual void
-    afterTouchChannel(uint8_t value) = 0;
+    afterTouch(uint8_t value) = 0;
 
     //
     // Event generated when a MIDI pitch bend message is routed to model

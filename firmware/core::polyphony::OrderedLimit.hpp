@@ -12,15 +12,18 @@
 namespace core {
 namespace polyphony {
 
-//
-// Ordered Polyphony Model
-//
 class OrderedLimit : public Polyphony
 {
 public:
     OrderedLimit(core::Key** keys, size_t keyCount) :
         _keyList(keys, keyCount)
     {}
+
+    const char *
+    name(void) 
+    {
+        return "Limit";
+    }
 
     void
     noteOff(uint8_t note, uint8_t velocity)
@@ -41,7 +44,7 @@ public:
     }
 
     void
-    afterTouchChannel(uint8_t value)
+    afterTouch(uint8_t value)
     {
 
     }

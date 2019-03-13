@@ -19,6 +19,12 @@ public:
         _keyList(keys, keyCount)
     {}
 
+    const char *
+    name(void) 
+    {
+        return "FIFO *";
+    }
+
     void
     noteOff(uint8_t note, uint8_t velocity)
     {
@@ -30,7 +36,7 @@ public:
     }
 
     void
-    afterTouchChannel(uint8_t value)
+    afterTouch(uint8_t value)
     {
 
     }
