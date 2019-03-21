@@ -1,8 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
 
 #include "config.h"
 
@@ -10,6 +8,8 @@
 #include "devices::dac::MSP4X2X.hpp"
 #include "devices::gate::Gate.h"
 #include "devices::midi::Serial.h"
+#include "devices::display::Display.h"
+#include "devices::display::SSD1306.h"
 
 #include "core::Control.h"
 #include "core::Key.h"
@@ -23,6 +23,9 @@
 #include "core::polyphony::OrderedLimit.hpp"
 #include "core::polyphony::PositionalHigh.hpp"
 #include "core::polyphony::PositionalLow.hpp"
+
+#include "core::ui::View.h"
+#include "core::ui::HomeView.hpp"
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
@@ -49,7 +52,7 @@ devices::gate::Gate gate3(PB15);
 devices::gate::Gate *gateList[] = {&gate0, &gate1, &gate2, &gate3};
 
 devices::midi::SerialMIDI midi(&Serial2);
-Adafruit_SSD1306 display;
+devices::display::SSD1306 display;
 
 core::Key key0(&dac0, &gate0);
 core::Key key1(&dac1, &gate1);
@@ -58,6 +61,8 @@ core::Key key3(&dac3, &gate3);
 core::Key *keyList[] = {&key0, &key1, &key2, &key3};
 
 core::polyphony::PolyphonyMode currentMode;
+
+core::ui::View *currentView = NULL;
 
 
 /// Initialisation code //////////////////////////////////////////////////////
@@ -83,13 +88,16 @@ setupDevices(void)
 
     // Delay Initialisation so device can stablise after power is applied.
     delay(500);
-    display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
-    display.clearDisplay();
-    display.setCursor(0, 0);
-    display.print("Savage\nCompany");
+    display.begin();
     display.display();
+
+    // display2.begin();
+    // display2.setTextSize(2);
+    // display2.setTextColor(WHITE);
+    // display2.clearDisplay();
+    // display2.setCursor(0, 0);
+    // display2.print("Savage\nCompany");
+    // display2.display();
 }
 
 
@@ -110,11 +118,14 @@ Route routeTable[MAX_NOTES] = {
 void
 setupProgram(void)
 {
-    routeTable[0].channel = 0;
-    routeTable[0].model = new core::polyphony::MonoSingle(&key0);
+    // routeTable[0].channel = 0;
+    // routeTable[0].model = new core::polyphony::MonoSingle(&key0);
 
-    routeTable[1].channel = 1;
-    routeTable[1].model = new core::polyphony::OrderedLimit(&keyList[1], 3);
+    // routeTable[1].channel = 1;
+    // routeTable[1].model = new core::polyphony::OrderedLimit(&keyList[1], 3);
+
+    routeTable[0].channel = 0;
+    routeTable[0].model = new core::polyphony::OrderedLimit(&keyList[0], 4);
 }
 
 void
@@ -174,53 +185,49 @@ onControlChange(uint8_t channel, uint8_t control, uint8_t value)
             currentMode = mode;
             core::polyphony::Polyphony *newModel = NULL;
 
+            delete routeTable[0].model;
+
             switch(mode) {
             case core::polyphony::ModeMonoPress:
-                delete routeTable[0].model;
                 routeTable[0].model = newModel = new core::polyphony::MonoPress(&key0);
                 break;
 
             case core::polyphony::ModeMonoSingle:
-                delete routeTable[0].model;
                 routeTable[0].model = newModel = new core::polyphony::MonoSingle(&key0);
                 break;
 
             case core::polyphony::ModeMonoTranspose:
-                delete routeTable[0].model;
                 routeTable[0].model = newModel = new core::polyphony::MonoTranspose(&key0);
                 break;
 
             case core::polyphony::ModeOrderedLIFO:
-                delete routeTable[1].model;
-                routeTable[1].model = newModel = new core::polyphony::OrderedLIFO(&keyList[1], 3);
+                routeTable[0].model = newModel = new core::polyphony::OrderedLIFO(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModeOrderedFIFO:
-                delete routeTable[1].model;
-                routeTable[1].model = newModel = new core::polyphony::OrderedFIFO(&keyList[1], 3);
+                routeTable[0].model = newModel = new core::polyphony::OrderedFIFO(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModeOrderedLimit:
-                delete routeTable[1].model;
-                routeTable[1].model = newModel = new core::polyphony::OrderedLimit(&keyList[1], 3);
+                routeTable[0].model = newModel = new core::polyphony::OrderedLimit(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModePositionalLow:
-                delete routeTable[1].model;
-                routeTable[1].model = newModel = new core::polyphony::PositionalLow(&keyList[1], 3);
+                routeTable[0].model = newModel = new core::polyphony::PositionalLow(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModePositionalHigh:
-                delete routeTable[1].model;
-                routeTable[1].model = newModel = new core::polyphony::PositionalHigh(&keyList[1], 3);
+                routeTable[0].model = newModel = new core::polyphony::PositionalHigh(&keyList[0], 4);
                 break;
             }
 
             Serial.print("Activate model: "); Serial.println(newModel->name());
-            display.clearDisplay();
-            display.setCursor(0, 0);
-            display.print("M: "); display.print(newModel->name());
-            display.display();
+            String fmt("M: ");
+            fmt += newModel->name();
+            // display2.clearDisplay();
+            // display2.setCursor(0, 0);
+            // display2.print(fmt);
+            // display2.display();
         }
     } else {
         Serial.print("Channel: "); Serial.print(channel);
@@ -254,11 +261,20 @@ setup(void)
     midi.afterTouchCallback(&onAfterTouch);
     //midi.pitchBendCallback(&onPitchBend);
 
-    Serial.print("Started...");
+    currentView = new core::ui::HomeView();
 }
 
 void 
 loop(void) 
 {
     midi.loop();
+
+    static uint8_t offset = 0;
+    offset++;
+    display.drawPixel(offset % 64, 0, INVERSE);
+    display.display();
+
+    // if (currentView->renderRequired()) {
+    //     currentView->render(&display);
+    // }
 }
