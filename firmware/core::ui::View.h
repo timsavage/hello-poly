@@ -4,6 +4,8 @@
  */
 #pragma once
 
+#include <Adafruit_GFX.h>
+
 namespace core {
 namespace ui {
 
@@ -14,13 +16,20 @@ public:
     // Render view
     //
     virtual void
-    render(void *display) = 0;
+    render(Adafruit_GFX *display) = 0;
 
     //
     // Determine if rendering is required
     //
     virtual int
-    renderRequired(void) = 0;
+    renderRequired(void) 
+    {
+        return _renderRequired;
+    }
+
+protected:
+    int _renderRequired;
+    
 };
 
 }}  //! ui::core
