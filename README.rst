@@ -2,7 +2,7 @@
 Hello Poly - Polyphonic MIDI to CV interface
 ############################################
 
-Polyphonic MIDI to CV module for modular synths, designed primarily for (but not limited to) Eurorack systems.
+Polyphonic MIDI to CV module for modular synths, hardware designed for Eurorack systems.
 
 Features:
 
@@ -15,9 +15,10 @@ Features:
 - Support for multiple programs (controlled via program change events)
 - Configuration via MIDI
 - Gate controlled LFO.
+- Firmware is hardware agnostic, could be compiled for other targets.
 
 Hardware
 
-- Designed around an 32 bit ARM STM module
+- Designed around an 32 bit ARM STM module.
 - MSP4822 12bit DACs
 - 192x32 SSD1306 OLED display
