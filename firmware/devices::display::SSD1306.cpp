@@ -27,7 +27,6 @@ All text above, and the splash screen below must be included in any redistributi
 using namespace devices::display;
 
 // the memory buffer for the LCD
-
 static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
@@ -41,7 +40,6 @@ static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8] = {
 0x00, 0x00, 0x00, 0x00, 0x80, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC, 0xF8, 0xE0, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80,
 0x80, 0x80, 0x00, 0x80, 0x80, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 0x80, 0x00, 0xFF,
-#if (SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH > 96*16)
 0xFF, 0xFF, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x80, 0x80, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00,
 0x80, 0xFF, 0xFF, 0x80, 0x80, 0x00, 0x80, 0x80, 0x00, 0x80, 0x80, 0x80, 0x80, 0x00, 0x80, 0x80,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x80, 0x00, 0x00, 0x8C, 0x8E, 0x84, 0x00, 0x00, 0x80, 0xF8,
@@ -96,7 +94,6 @@ static uint8_t buffer[SSD1306_LCDHEIGHT * SSD1306_LCDWIDTH / 8] = {
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 #endif
-#endif
 };
 
 void 
@@ -136,17 +133,14 @@ SSD1306::begin()
 	// Init sequence
 	sendCommand(SSD1306_DISPLAYOFF);
 	sendCommand(SSD1306_SETDISPLAYCLOCKDIV, 0x80);  // the suggested ratio 0x80
-
 	sendCommand(SSD1306_SETMULTIPLEX, SSD1306_LCDHEIGHT - 1);
 
 	sendCommand(SSD1306_SETDISPLAYOFFSET, 0x0);  // no offset
 	sendCommand(SSD1306_SETSTARTLINE | 0x0);  // line #0
 	if (_vccstate == SSD1306_EXTERNALVCC) { 
 		sendCommand(SSD1306_CHARGEPUMP, 0x10);
-		sendCommand(0x10); 
 	} else { 
 		sendCommand(SSD1306_CHARGEPUMP, 0x14);
-		sendCommand(0x14); 
 	}
 	sendCommand(SSD1306_MEMORYMODE, 0x0);
 	sendCommand(SSD1306_SEGREMAP | 0x1);
@@ -162,13 +156,6 @@ SSD1306::begin()
 	} else { 
 		sendCommand(SSD1306_SETCONTRAST, 0xCF);
 	}
-#elif defined SSD1306_96_16
-	sendCommand(SSD1306_SETCOMPINS, 0x02);
-	if (_vccstate == SSD1306_EXTERNALVCC) { 
-		sendCommand(SSD1306_SETCONTRAST, 0x10);
-	} else { 
-		sendCommand(SSD1306_SETCONTRAST, 0xAF);
-	}
 #endif
 
 	if (_vccstate == SSD1306_EXTERNALVCC) { 
@@ -179,20 +166,18 @@ SSD1306::begin()
 	sendCommand(SSD1306_SETVCOMDETECT, 0x40); 
 	sendCommand(SSD1306_DISPLAYALLON_RESUME);
 	sendCommand(SSD1306_NORMALDISPLAY);
-
 	sendCommand(SSD1306_DEACTIVATE_SCROLL);
-
 	sendCommand(SSD1306_DISPLAYON);
 }
 
 void 
 SSD1306::invertDisplay(uint8_t i) 
 {
-  if (i) {
-    sendCommand(SSD1306_INVERTDISPLAY);
-  } else {
-    sendCommand(SSD1306_NORMALDISPLAY);
-  }
+    if (i) {
+        sendCommand(SSD1306_INVERTDISPLAY);
+    } else {
+        sendCommand(SSD1306_NORMALDISPLAY);
+    }
 }
 
 void 
@@ -255,40 +240,6 @@ SSD1306::sendCommand(uint8_t c, uint8_t a1, uint8_t a2)
 //   sendCommand(SSD1306_ACTIVATE_SCROLL);
 // }
 
-// // startscrolldiagright
-// // Activate a diagonal scroll for rows start through stop
-// // Hint, the display is 16 rows tall. To scroll the whole display, run:
-// // display.scrollright(0x00, 0x0F)
-// void SSD1306::startscrolldiagright(uint8_t start, uint8_t stop){
-//   sendCommand(SSD1306_SET_VERTICAL_SCROLL_AREA);
-//   sendCommand(0X00);
-//   sendCommand(SSD1306_LCDHEIGHT);
-//   sendCommand(SSD1306_VERTICAL_AND_RIGHT_HORIZONTAL_SCROLL);
-//   sendCommand(0X00);
-//   sendCommand(start);
-//   sendCommand(0X00);
-//   sendCommand(stop);
-//   sendCommand(0X01);
-//   sendCommand(SSD1306_ACTIVATE_SCROLL);
-// }
-
-// // startscrolldiagleft
-// // Activate a diagonal scroll for rows start through stop
-// // Hint, the display is 16 rows tall. To scroll the whole display, run:
-// // display.scrollright(0x00, 0x0F)
-// void SSD1306::startscrolldiagleft(uint8_t start, uint8_t stop){
-//   sendCommand(SSD1306_SET_VERTICAL_SCROLL_AREA);
-//   sendCommand(0X00);
-//   sendCommand(SSD1306_LCDHEIGHT);
-//   sendCommand(SSD1306_VERTICAL_AND_LEFT_HORIZONTAL_SCROLL);
-//   sendCommand(0X00);
-//   sendCommand(start);
-//   sendCommand(0X00);
-//   sendCommand(stop);
-//   sendCommand(0X01);
-//   sendCommand(SSD1306_ACTIVATE_SCROLL);
-// }
-
 // void SSD1306::stopscroll(void){
 //   sendCommand(SSD1306_DEACTIVATE_SCROLL);
 // }
@@ -299,35 +250,31 @@ SSD1306::sendCommand(uint8_t c, uint8_t a1, uint8_t a2)
 void 
 SSD1306::dim(boolean dim) 
 {
-	uint8_t contrast;
+    uint8_t contrast;
 
-	if (dim) {
-		contrast = 0; // Dimmed display
-	} else {
-		if (_vccstate == SSD1306_EXTERNALVCC) {
-			contrast = 0x9F;
-		} else {
-			contrast = 0xCF;
-		}
-	}
-	// the range of contrast to too small to be really useful
-	// it is useful to dim the display
-	sendCommand(SSD1306_SETCONTRAST, contrast);
+    if (dim) {
+        contrast = 0; // Dimmed display
+    } else {
+        if (_vccstate == SSD1306_EXTERNALVCC) {
+            contrast = 0x9F;
+        } else {
+            contrast = 0xCF;
+        }
+    }
+    // the range of contrast to too small to be really useful
+    // it is useful to dim the display
+    sendCommand(SSD1306_SETCONTRAST, contrast);
 }
 
 void 
 SSD1306::display(void) 
 {
-	sendCommand(SSD1306_COLUMNADDR, 0, SSD1306_LCDWIDTH - 1);
-	#if SSD1306_LCDHEIGHT == 64
-		sendCommand(SSD1306_PAGEADDR, 0, 7);
-	#endif
-	#if SSD1306_LCDHEIGHT == 32
-		sendCommand(SSD1306_PAGEADDR, 0, 3);
-	#endif
-	#if SSD1306_LCDHEIGHT == 16
-		sendCommand(SSD1306_PAGEADDR, 0, 1);
-	#endif
+    sendCommand(SSD1306_COLUMNADDR, 0, SSD1306_LCDWIDTH - 1);
+#if SSD1306_LCDHEIGHT == 64
+    sendCommand(SSD1306_PAGEADDR, 0, 7);
+#elif SSD1306_LCDHEIGHT == 32
+    sendCommand(SSD1306_PAGEADDR, 0, 3);
+#endif
 
     // save I2C bitrate
 #ifdef TWBR
@@ -336,15 +283,15 @@ SSD1306::display(void)
 #endif
 
     for (uint16_t i = 0; i < (SSD1306_LCDWIDTH * SSD1306_LCDHEIGHT / 8); i++) {
-		// send a bunch of data in one xmission
-		Wire.beginTransmission(_i2caddr);
-		Wire.write(0x40);
-		for (uint8_t x = 0; x < 16; x++) {
-			Wire.write(buffer[i]);
-			i++;
-		}
-		i--;
-		Wire.endTransmission();
+        // send a bunch of data in one xmission
+        Wire.beginTransmission(_i2caddr);
+        Wire.write(0x40);
+        for (uint8_t x = 0; x < 16; x++) {
+            Wire.write(buffer[i]);
+            i++;
+        }
+        i--;
+        Wire.endTransmission();
     }
 
 #ifdef TWBR

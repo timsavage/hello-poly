@@ -14,24 +14,9 @@ namespace display {
 
 #define SSD1306_I2C_ADDRESS   0x3C
 
-/*=========================================================================
-    SSD1306 Displays
-    -----------------------------------------------------------------------
-    The driver is used in multiple displays (128x64, 128x32, etc.).
-    Select the appropriate display below to create an appropriately
-    sized framebuffer, etc.
-
-    SSD1306_128_64  128x64 pixel display
-
-    SSD1306_128_32  128x32 pixel display
-
-    SSD1306_96_16
-
-    -----------------------------------------------------------------------*/
 //   #define SSD1306_128_64
-   #define SSD1306_128_32
+#define SSD1306_128_32
 //   #define SSD1306_96_16
-/*=========================================================================*/
 
 #if defined SSD1306_128_64 && defined SSD1306_128_32
   #error "Only one SSD1306 display can be specified at once in SSD1306.h"
@@ -60,33 +45,22 @@ namespace display {
 #define SSD1306_INVERTDISPLAY 0xA7
 #define SSD1306_DISPLAYOFF 0xAE
 #define SSD1306_DISPLAYON 0xAF
-
 #define SSD1306_SETDISPLAYOFFSET 0xD3
 #define SSD1306_SETCOMPINS 0xDA
-
 #define SSD1306_SETVCOMDETECT 0xDB
-
 #define SSD1306_SETDISPLAYCLOCKDIV 0xD5
 #define SSD1306_SETPRECHARGE 0xD9
-
 #define SSD1306_SETMULTIPLEX 0xA8
-
 #define SSD1306_SETLOWCOLUMN 0x00
 #define SSD1306_SETHIGHCOLUMN 0x10
-
 #define SSD1306_SETSTARTLINE 0x40
-
 #define SSD1306_MEMORYMODE 0x20
 #define SSD1306_COLUMNADDR 0x21
 #define SSD1306_PAGEADDR   0x22
-
 #define SSD1306_COMSCANINC 0xC0
 #define SSD1306_COMSCANDEC 0xC8
-
 #define SSD1306_SEGREMAP 0xA0
-
 #define SSD1306_CHARGEPUMP 0x8D
-
 #define SSD1306_EXTERNALVCC 0x1
 #define SSD1306_SWITCHCAPVCC 0x2
 
