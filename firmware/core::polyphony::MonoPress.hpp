@@ -17,9 +17,12 @@ namespace polyphony {
 class MonoPress : public Polyphony
 {
 public:
-    MonoPress(Key *key) : 
-        _key(key)
-    {}
+    MonoPress(core::Key** keys, size_t keyCount)
+    {
+        if (keyCount > 0) {
+            _key = keys[0];
+        }
+    }
 
     const char *
     name(void) 

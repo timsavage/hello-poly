@@ -17,9 +17,12 @@ namespace polyphony {
 class MonoSingle : public Polyphony
 {
 public:
-    MonoSingle(Key *key) : 
-        _key(key)
-    {}
+    MonoSingle(core::Key** keys, size_t keyCount)
+    {
+        if (keyCount > 0) {
+            _key = keys[0];
+        }
+    }
 
     const char *
     name(void) 

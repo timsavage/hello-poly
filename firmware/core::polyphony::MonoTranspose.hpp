@@ -17,9 +17,12 @@ namespace polyphony {
 class MonoTranspose : public Polyphony
 {
 public:
-    MonoTranspose(Key *key) : 
-        _key(key)
-    {}
+    MonoTranspose(core::Key** keys, size_t keyCount)
+    {
+        if (keyCount > 0) {
+            _key = keys[0];
+        }
+    }
 
     const char *
     name(void) 
