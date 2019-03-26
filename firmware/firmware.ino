@@ -94,14 +94,8 @@ setupDevices(void)
     delay(500);
     display.begin();
     display.display();
-
-    // display2.begin();
-    // display2.setTextSize(2);
-    // display2.setTextColor(WHITE);
-    // display2.clearDisplay();
-    // display2.setCursor(0, 0);
-    // display2.print("Savage\nCompany");
-    // display2.display();
+    display.setTextSize(1);
+    display.setTextColor(WHITE);
 }
 
 
@@ -262,11 +256,6 @@ void
 loop(void) 
 {
     midi.loop();
-
-    static uint8_t offset = 0;
-    offset++;
-    display.drawPixel(offset % 128, offset % 32, INVERSE);
-    display.display();
 
     if (currentView->renderRequired()) {
         currentView->render(&display);
