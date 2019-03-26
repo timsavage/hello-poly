@@ -4,7 +4,9 @@
  */
 #pragma once
 
-#include <Adafruit_GFX.h>
+#include "devices::display::SSD1306.h"
+
+using namespace devices::display;
 
 namespace core {
 namespace ui {
@@ -16,7 +18,7 @@ public:
     // Render view
     //
     virtual void
-    render(Adafruit_GFX *display) = 0;
+    render(SSD1306 *display) = 0;
 
     //
     // Determine if rendering is required

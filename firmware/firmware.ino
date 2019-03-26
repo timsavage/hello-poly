@@ -8,7 +8,6 @@
 #include "devices::dac::MSP4X2X.hpp"
 #include "devices::gate::Gate.h"
 #include "devices::midi::Serial.h"
-#include "devices::display::Display.h"
 #include "devices::display::SSD1306.h"
 
 #include "core::Control.h"
@@ -29,7 +28,9 @@
 
 #define ARRAY_SIZE(x) (sizeof(x) / sizeof(x[0]))
 
-// Define DACs
+
+//-- Define devices ------------------------------------------------
+
 devices::dac::MSP4X22 dac0(PA1, MSP4X22_DAC_A);
 devices::dac::MSP4X22 dac1(PA1, MSP4X22_DAC_B);
 // devices::dac::MSP4X22 dac2(PA4, MSP4X22_DAC_A);
@@ -44,7 +45,6 @@ devices::dac::MockDAC dac4;
 devices::dac::MockDAC dac5;
 devices::dac::DAC *dacList[] = {&dac0, &dac1, &dac2, &dac3, &dac4, &dac5};
 
-// Define devices
 devices::gate::Gate gate0(PB12);
 devices::gate::Gate gate1(PB13);
 devices::gate::Gate gate2(PB14);
@@ -54,10 +54,14 @@ devices::gate::Gate *gateList[] = {&gate0, &gate1, &gate2, &gate3};
 devices::midi::SerialMIDI midi(&Serial2);
 devices::display::SSD1306 display;
 
+
+//-- Controls ------------------------------------------------------
+
 core::Key key0(&dac0, &gate0);
 core::Key key1(&dac1, &gate1);
 core::Key key2(&dac2, &gate2);
 core::Key key3(&dac3, &gate3);
+
 core::Key *keyList[] = {&key0, &key1, &key2, &key3};
 
 core::polyphony::PolyphonyMode currentMode;
@@ -65,7 +69,7 @@ core::polyphony::PolyphonyMode currentMode;
 core::ui::View *currentView = NULL;
 
 
-/// Initialisation code //////////////////////////////////////////////////////
+//-- Initialisation code -------------------------------------------
 
 void 
 setupDevices(void)
@@ -101,7 +105,7 @@ setupDevices(void)
 }
 
 
-/// Message routing //////////////////////////////////////////////////////
+//-- Message routing -----------------------------------------------
 
 typedef struct {
     uint8_t channel;
@@ -118,12 +122,6 @@ Route routeTable[MAX_NOTES] = {
 void
 setupProgram(void)
 {
-    // routeTable[0].channel = 0;
-    // routeTable[0].model = new core::polyphony::MonoSingle(&key0);
-
-    // routeTable[1].channel = 1;
-    // routeTable[1].model = new core::polyphony::OrderedLimit(&keyList[1], 3);
-
     routeTable[0].channel = 0;
     routeTable[0].model = new core::polyphony::OrderedLimit(&keyList[0], 4);
 }
@@ -189,15 +187,15 @@ onControlChange(uint8_t channel, uint8_t control, uint8_t value)
 
             switch(mode) {
             case core::polyphony::ModeMonoPress:
-                routeTable[0].model = newModel = new core::polyphony::MonoPress(&key0);
+                routeTable[0].model = newModel = new core::polyphony::MonoPress(&keyList[0], 1);
                 break;
 
             case core::polyphony::ModeMonoSingle:
-                routeTable[0].model = newModel = new core::polyphony::MonoSingle(&key0);
+                routeTable[0].model = newModel = new core::polyphony::MonoSingle(&keyList[0], 1);
                 break;
 
             case core::polyphony::ModeMonoTranspose:
-                routeTable[0].model = newModel = new core::polyphony::MonoTranspose(&key0);
+                routeTable[0].model = newModel = new core::polyphony::MonoTranspose(&keyList[0], 1);
                 break;
 
             case core::polyphony::ModeOrderedLIFO:
@@ -224,10 +222,6 @@ onControlChange(uint8_t channel, uint8_t control, uint8_t value)
             Serial.print("Activate model: "); Serial.println(newModel->name());
             String fmt("M: ");
             fmt += newModel->name();
-            // display2.clearDisplay();
-            // display2.setCursor(0, 0);
-            // display2.print(fmt);
-            // display2.display();
         }
     } else {
         Serial.print("Channel: "); Serial.print(channel);
@@ -271,10 +265,10 @@ loop(void)
 
     static uint8_t offset = 0;
     offset++;
-    display.drawPixel(offset % 64, 0, INVERSE);
+    display.drawPixel(offset % 128, offset % 32, INVERSE);
     display.display();
 
-    // if (currentView->renderRequired()) {
-    //     currentView->render(&display);
-    // }
+    if (currentView->renderRequired()) {
+        currentView->render(&display);
+    }
 }
