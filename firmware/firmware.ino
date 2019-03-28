@@ -23,6 +23,8 @@
 #include "core::polyphony::PositionalHigh.hpp"
 #include "core::polyphony::PositionalLow.hpp"
 
+#include "core::Router.hpp"
+
 #include "core::ui::View.h"
 #include "core::ui::HomeView.hpp"
 
@@ -64,9 +66,8 @@ core::Key key3(&dac3, &gate3);
 
 core::Key *keyList[] = {&key0, &key1, &key2, &key3};
 
-core::polyphony::PolyphonyMode currentMode;
-
 core::ui::View *currentView = NULL;
+core::Router routeTable;
 
 
 //-- Initialisation code -------------------------------------------
@@ -101,117 +102,82 @@ setupDevices(void)
 
 //-- Message routing -----------------------------------------------
 
-typedef struct {
-    uint8_t channel;
-    core::polyphony::Polyphony *model;
-} Route;
-
-Route routeTable[MAX_NOTES] = {
-    {255, NULL},
-    {255, NULL},
-    {255, NULL},
-    {255, NULL},
-};
-
 void
 setupProgram(void)
 {
-    routeTable[0].channel = 0;
-    routeTable[0].model = new core::polyphony::OrderedLimit(&keyList[0], 4);
+    routeTable.empty();
+    routeTable.add(0, new core::polyphony::OrderedLimit(&keyList[0], 4));
 }
 
 void
 onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
 {
-    Route *route;
-    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
-        route = &routeTable[idx];
-        if (route->channel == channel) {
-            route->model->noteOff(note, velocity);
-        }
-    }
+    routeTable.onNoteOff(channel, note, velocity);
 }
 
 void
 onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
 {
-    Route *route;
-    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
-        route = &routeTable[idx];
-        if (route->channel == channel) {
-            route->model->noteOn(note, velocity);
-        }
-    }
+    routeTable.onNoteOn(channel, note, velocity);
 }
 
 void
 onAfterTouch(uint8_t channel, uint8_t value)
 {
-    Route *route;
-    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
-        route = &routeTable[idx];
-        if (route->channel == channel) {
-            route->model->afterTouch(value);
-        }
-    }
+    routeTable.onAfterTouch(channel, value);
 }
 
 void
 onPitchBend(uint8_t channel, int16_t change)
 {
-    Route *route;
-    for (size_t idx = 0; idx < MAX_NOTES; idx++) {
-        route = &routeTable[idx];
-        if (route->channel == channel) {
-            route->model->pitchBend(change);
-        }
-    }
+    routeTable.onPitchBend(channel, change);
 }
 
 void
 onControlChange(uint8_t channel, uint8_t control, uint8_t value)
 {
+    static core::polyphony::PolyphonyMode currentMode;
+
     if (control == 0x4b) {
         core::polyphony::PolyphonyMode mode = (core::polyphony::PolyphonyMode)((value >> 2) % 8);
         if (mode != currentMode) {
             currentMode = mode;
             core::polyphony::Polyphony *newModel = NULL;
 
-            delete routeTable[0].model;
-
             switch(mode) {
             case core::polyphony::ModeMonoPress:
-                routeTable[0].model = newModel = new core::polyphony::MonoPress(&keyList[0], 1);
+                newModel = new core::polyphony::MonoPress(&keyList[0], 1);
                 break;
 
             case core::polyphony::ModeMonoSingle:
-                routeTable[0].model = newModel = new core::polyphony::MonoSingle(&keyList[0], 1);
+                newModel = new core::polyphony::MonoSingle(&keyList[0], 1);
                 break;
 
             case core::polyphony::ModeMonoTranspose:
-                routeTable[0].model = newModel = new core::polyphony::MonoTranspose(&keyList[0], 1);
+                newModel = new core::polyphony::MonoTranspose(&keyList[0], 1);
                 break;
 
             case core::polyphony::ModeOrderedLIFO:
-                routeTable[0].model = newModel = new core::polyphony::OrderedLIFO(&keyList[0], 4);
+                newModel = new core::polyphony::OrderedLIFO(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModeOrderedFIFO:
-                routeTable[0].model = newModel = new core::polyphony::OrderedFIFO(&keyList[0], 4);
+                newModel = new core::polyphony::OrderedFIFO(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModeOrderedLimit:
-                routeTable[0].model = newModel = new core::polyphony::OrderedLimit(&keyList[0], 4);
+                newModel = new core::polyphony::OrderedLimit(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModePositionalLow:
-                routeTable[0].model = newModel = new core::polyphony::PositionalLow(&keyList[0], 4);
+                newModel = new core::polyphony::PositionalLow(&keyList[0], 4);
                 break;
 
             case core::polyphony::ModePositionalHigh:
-                routeTable[0].model = newModel = new core::polyphony::PositionalHigh(&keyList[0], 4);
+                newModel = new core::polyphony::PositionalHigh(&keyList[0], 4);
                 break;
             }
+            routeTable.updateModel(0, newModel);
 
             Serial.print("Activate model: "); Serial.println(newModel->name());
             String fmt("M: ");
