@@ -21,4 +21,4 @@ Hardware
 
 - Designed around an 32 bit ARM STM module.
 - MSP4822 12bit DACs
-- 192x64 SSD1306 OLED display
+- 128x64 SSD1306 OLED display
