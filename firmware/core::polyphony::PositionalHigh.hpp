@@ -5,6 +5,7 @@
  */
 #pragma once
 
+#include "config.h"
 #include "core::polyphony::Polyphony.h"
 #include "core::Key.h"
 #include "core::KeyList.h"
@@ -21,6 +22,9 @@ public:
         memset(_notes, NULL_NOTE, MAX_NOTES + 1);
     }
 
+    ~PositionalHigh(void)
+    {}
+
     const char *
     name(void) 
     {
@@ -28,7 +32,7 @@ public:
     }
 
     void
-    noteOff(uint8_t note, uint8_t velocity)
+    noteOff(uint8_t note, uint8_t)
     {
         size_t count = _keyList.count();
         for (size_t idx = 0; idx < count; idx++) {
@@ -45,7 +49,7 @@ public:
     }
 
     void
-    noteOn(uint8_t note, uint8_t velocity)
+    noteOn(uint8_t note, uint8_t)
     {
         // Insert note into buffer
         uint8_t val;
@@ -72,7 +76,7 @@ public:
     }
 
     void
-    afterTouch(uint8_t value)
+    afterTouch(uint8_t)
     {
 
     }

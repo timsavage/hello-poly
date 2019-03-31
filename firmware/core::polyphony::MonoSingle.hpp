@@ -24,6 +24,9 @@ public:
         }
     }
 
+    ~MonoSingle(void) 
+    {}
+
     const char *
     name(void) 
     {
@@ -31,7 +34,7 @@ public:
     }
 
     void
-    noteOn(uint8_t note, uint8_t velocity)
+    noteOn(uint8_t note, uint8_t)
     {
         if (_key->getNote() == NULL_NOTE) {
             _key->press(note);
@@ -39,7 +42,7 @@ public:
     }
 
     void
-    noteOff(uint8_t note, uint8_t velocity)
+    noteOff(uint8_t note, uint8_t)
     {
         if (_key->getNote() == note) {
             _key->release();
@@ -47,7 +50,7 @@ public:
     }
 
     void
-    afterTouch(uint8_t value)
+    afterTouch(uint8_t)
     {
 
     }

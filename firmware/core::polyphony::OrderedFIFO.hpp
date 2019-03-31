@@ -18,6 +18,9 @@ public:
     OrderedFIFO(core::Key** keys, size_t keyCount) :
         _keyList(keys, keyCount)
     {}
+    
+    ~OrderedFIFO(void) 
+    {}
 
     const char *
     name(void) 
@@ -26,17 +29,17 @@ public:
     }
 
     void
-    noteOff(uint8_t note, uint8_t velocity)
+    noteOff(uint8_t note, uint8_t)
     {
     }
 
     void
-    noteOn(uint8_t note, uint8_t velocity)
+    noteOn(uint8_t note, uint8_t)
     {
     }
 
     void
-    afterTouch(uint8_t value)
+    afterTouch(uint8_t)
     {
 
     }

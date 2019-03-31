@@ -26,6 +26,9 @@ enum PolyphonyMode : uint8_t
 class Polyphony
 {
 public:
+    virtual 
+    ~Polyphony() = 0;
+
     //
     // Name of polyphony model
     //

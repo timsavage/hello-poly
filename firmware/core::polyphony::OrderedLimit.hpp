@@ -19,6 +19,9 @@ public:
         _keyList(keys, keyCount)
     {}
 
+    ~OrderedLimit(void)
+    {}
+
     const char *
     name(void) 
     {
@@ -26,7 +29,7 @@ public:
     }
 
     void
-    noteOff(uint8_t note, uint8_t velocity)
+    noteOff(uint8_t note, uint8_t)
     {
         Key *key = _keyList.find(note);
         if (key != NULL) {
@@ -35,7 +38,7 @@ public:
     }
 
     void
-    noteOn(uint8_t note, uint8_t velocity)
+    noteOn(uint8_t note, uint8_t)
     {
         Key *key = _keyList.firstOpen();
         if (key != NULL) {
@@ -44,7 +47,7 @@ public:
     }
 
     void
-    afterTouch(uint8_t value)
+    afterTouch(uint8_t)
     {
 
     }
