@@ -14,16 +14,8 @@
 #include "core::Key.h"
 
 #include "core::polyphony::Polyphony.h"
-#include "core::polyphony::MonoPress.hpp"
-#include "core::polyphony::MonoSingle.hpp"
-#include "core::polyphony::MonoTranspose.hpp"
-#include "core::polyphony::OrderedFIFO.hpp"
-#include "core::polyphony::OrderedLIFO.hpp"
-#include "core::polyphony::OrderedLimit.hpp"
-#include "core::polyphony::PositionalHigh.hpp"
-#include "core::polyphony::PositionalLow.hpp"
 
-#include "core::Router.hpp"
+#include "core::Router.h"
 
 #include "core::ui::View.h"
 #include "core::ui::HomeView.hpp"
@@ -53,7 +45,7 @@ devices::gate::Gate gate2(PB14);
 devices::gate::Gate gate3(PB15);
 devices::gate::Gate *gateList[] = {&gate0, &gate1, &gate2, &gate3};
 
-devices::midi::SerialMIDI midi(&Serial2);
+devices::midi::SerialMIDI midi(&Serial3);
 devices::display::SSD1306 display;
 
 
@@ -67,7 +59,6 @@ core::Key key3(&dac3, &gate3);
 core::Key *keyList[] = {&key0, &key1, &key2, &key3};
 
 core::ui::View *currentView = NULL;
-core::Router routeTable;
 
 
 //-- Initialisation code -------------------------------------------
@@ -90,6 +81,7 @@ setupDevices(void)
     }
 
     midi.begin();
+    core::Router.begin(&midi);
 
     // Delay Initialisation so device can stablise after power is applied.
     delay(500);
@@ -105,32 +97,8 @@ setupDevices(void)
 void
 setupProgram(void)
 {
-    routeTable.empty();
-    routeTable.add(0, new core::polyphony::OrderedLimit(&keyList[0], 4));
-}
-
-void
-onNoteOff(uint8_t channel, uint8_t note, uint8_t velocity)
-{
-    routeTable.onNoteOff(channel, note, velocity);
-}
-
-void
-onNoteOn(uint8_t channel, uint8_t note, uint8_t velocity)
-{
-    routeTable.onNoteOn(channel, note, velocity);
-}
-
-void
-onAfterTouch(uint8_t channel, uint8_t value)
-{
-    routeTable.onAfterTouch(channel, value);
-}
-
-void
-onPitchBend(uint8_t channel, int16_t change)
-{
-    routeTable.onPitchBend(channel, change);
+    core::Router.empty();
+    core::Router.add(0, core::polyphony::ModeOrderedLimit, &keyList[0], 4);
 }
 
 void
@@ -142,59 +110,34 @@ onControlChange(uint8_t channel, uint8_t control, uint8_t value)
         core::polyphony::PolyphonyMode mode = (core::polyphony::PolyphonyMode)((value >> 2) % 8);
         if (mode != currentMode) {
             currentMode = mode;
-            core::polyphony::Polyphony *newModel = NULL;
 
-            switch(mode) {
-            case core::polyphony::ModeMonoPress:
-                newModel = new core::polyphony::MonoPress(&keyList[0], 1);
-                break;
+            core::Router.empty();
+            core::Router.add(0, mode, &keyList[0], 4);
 
-            case core::polyphony::ModeMonoSingle:
-                newModel = new core::polyphony::MonoSingle(&keyList[0], 1);
-                break;
-
-            case core::polyphony::ModeMonoTranspose:
-                newModel = new core::polyphony::MonoTranspose(&keyList[0], 1);
-                break;
-
-            case core::polyphony::ModeOrderedLIFO:
-                newModel = new core::polyphony::OrderedLIFO(&keyList[0], 4);
-                break;
-
-            case core::polyphony::ModeOrderedFIFO:
-                newModel = new core::polyphony::OrderedFIFO(&keyList[0], 4);
-                break;
-
-            case core::polyphony::ModeOrderedLimit:
-                newModel = new core::polyphony::OrderedLimit(&keyList[0], 4);
-                break;
-
-            case core::polyphony::ModePositionalLow:
-                newModel = new core::polyphony::PositionalLow(&keyList[0], 4);
-                break;
-
-            case core::polyphony::ModePositionalHigh:
-                newModel = new core::polyphony::PositionalHigh(&keyList[0], 4);
-                break;
-            }
-            routeTable.updateModel(0, newModel);
-
-            Serial.print("Activate model: "); Serial.println(newModel->name());
+            Serial1.print("Activate mode: "); Serial1.print(mode); Serial1.print(" - ");
+            core::Route *route = core::Router.getRoute(0);
+            Serial1.println(route->mode == NULL);
+            Serial1.println(route->mode->name());
             String fmt("M: ");
-            fmt += newModel->name();
+            fmt += route->mode->name();
         }
     } else {
-        Serial.print("Channel: "); Serial.print(channel);
-        Serial.print("; Control: "); Serial.print(control, HEX); 
-        Serial.print("; Value: "); Serial.println(value);  
+        Serial1.print("Channel: "); Serial1.print(channel);
+        Serial1.print("; Control: "); Serial1.print(control, HEX); 
+        Serial1.print("; Value: "); Serial1.println(value);  
     }
 }
 
 void
 onProgramChange(uint8_t channel, uint8_t program)
 {
-    Serial.print("Channel: "); Serial.print(channel);
-    Serial.print("; Program: "); Serial.println(program);
+    Serial1.print("Channel: "); Serial1.print(channel);
+    Serial1.print("; Program: "); Serial1.println(program);
+
+    display.setCursor(0, 0);
+    display.clearDisplay();
+    display.print("Program: "); display.print(program); 
+    display.display();
 }
 
 void 
@@ -203,17 +146,14 @@ setup(void)
     // Set up the built-in LED pin as an output:
     pinMode(PC13, OUTPUT);
 
-    Serial.begin(115200);
+    Serial1.begin(115200);
+    Serial1.print("Hello Polly - Savage.Company - v0.1\n");
     
     setupDevices();
     setupProgram();
 
-    midi.noteOffCallback(&onNoteOff);
-    midi.noteOnCallback(&onNoteOn);
     midi.controlChangeCallback(&onControlChange);
     midi.programChangeCallback(&onProgramChange);
-    midi.afterTouchCallback(&onAfterTouch);
-    //midi.pitchBendCallback(&onPitchBend);
 
     currentView = new core::ui::HomeView();
 }
