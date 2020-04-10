@@ -18,7 +18,14 @@ Features:
 - Firmware is hardware agnostic, could be compiled for other targets.
 
 Hardware
+========
 
-- Designed around an 32 bit ARM STM module.
+- Designed around an STM32F411 32bit ARM MCU
 - MSP4822 12bit DACs
 - 128x64 SSD1306 OLED display
+
+Software
+========
+
+Software currently using Arduino, however, I am migrating to using CMSIS and the STM32 HAL 
+using the STM32CubeIDE mainly for the debugging support!
